@@ -6,7 +6,7 @@ from .detectors import run_llm_audit, run_slither
 from .example_replay import list_examples, replay_events
 from .models import DetectRequest, JobCreated, VerifyRequest
 from .poc_agent import create_replay_job, get_job, start_job
-from .project_store import create_from_example, create_from_zip, get_project_root, list_project_files
+from .project_store import IGNORED_FILES, IGNORED_PARTS, create_from_example, create_from_zip, get_project_root, list_project_files
 from .slither_cfg import generate_cfg
 from .solidity_parser import parse_structure
 
@@ -63,8 +63,15 @@ def cfg(project_id: str, source_file: str | None = None):
 
     if source_file:
         target = (root / source_file).resolve()
-        if root.resolve() not in target.parents or not target.exists():
-            raise HTTPException(status_code=400, detail="source_file must be inside the project")
+        rel_parts = target.relative_to(root.resolve()).parts if root.resolve() in target.parents else ()
+        if (
+            root.resolve() not in target.parents
+            or not target.exists()
+            or target.suffix != ".sol"
+            or target.name in IGNORED_FILES
+            or any(part in IGNORED_PARTS for part in rel_parts)
+        ):
+            raise HTTPException(status_code=400, detail="source_file must be a Solidity source file inside the project input")
     else:
         candidates = sorted((root / "src").rglob("*.sol")) if (root / "src").exists() else sorted(root.rglob("*.sol"))
         candidates = [path for path in candidates if "test" not in path.parts and "preprocessed" not in path.parts]
