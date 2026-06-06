@@ -14,6 +14,7 @@ python-multipart==0.0.32
 # Request/response models and OpenAI-compatible LLM client
 pydantic==2.13.4
 openai==2.41.0
+python-dotenv==1.0.1
 
 # Solidity static analysis and compiler-version selection
 slither-analyzer==0.11.5

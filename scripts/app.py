@@ -1,10 +1,14 @@
 from __future__ import annotations
 
 from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 
+from .config import default_llm_config
 from .detectors import run_llm_audit, run_slither
 from .example_replay import list_examples, replay_events
 from .models import DetectRequest, JobCreated, VerifyRequest
+from .pipeline import replay_as_stream, run_audit_pipeline
 from .poc_agent import create_replay_job, get_job, start_job
 from .project_store import IGNORED_FILES, IGNORED_PARTS, create_from_example, create_from_zip, get_project_root, list_project_files
 from .slither_cfg import generate_cfg
@@ -12,6 +16,14 @@ from .solidity_parser import parse_structure
 
 
 app = FastAPI(title="ETH Beijing Smart Audit Backend", version="0.1.0")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/api/health")
@@ -130,3 +142,33 @@ def job_events(job_id: str):
         return get_job(job_id).events
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=f"Unknown job: {job_id}") from exc
+
+
+@app.get("/api/projects/{project_id}/audit/stream")
+def audit_stream(project_id: str):
+    try:
+        root = get_project_root(project_id)
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    try:
+        llm = default_llm_config()
+    except RuntimeError as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc
+    return StreamingResponse(
+        run_audit_pipeline(project_id, root, llm),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )
+
+
+@app.get("/api/examples/{case_id}/stream")
+def example_stream(case_id: str):
+    from .config import EXAMPLE_ROOT
+    case_dir = (EXAMPLE_ROOT / case_id).resolve()
+    if not case_dir.exists():
+        raise HTTPException(status_code=404, detail=f"Unknown example: {case_id}")
+    return StreamingResponse(
+        replay_as_stream(case_id),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )

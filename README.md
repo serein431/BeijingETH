@@ -1,104 +1,119 @@
-# BeijingETH
+# Smart Audit — AI-Powered Solidity Security Auditor
 
-Backend for a Solidity smart contract audit demo. It supports project upload,
-contract/function structure extraction, Slither or LLM-based finding discovery,
-and Foundry PoC verification.
+An end-to-end smart contract security audit platform. Upload a Solidity project (or pick a built-in example), and watch the AI analyze vulnerabilities in real-time with streaming output and an animated pipeline visualization.
+
+## Architecture
+
+```
+┌──────────┬─────────────────────────┬────────────────────┐
+│ Sidebar  │   Stream Panel (Left)   │  Flow Panel (Right) │
+│          │                         │                     │
+│          │  Streaming LLM analysis │  Pipeline nodes:    │
+│          │  with markdown render   │  Parse → Slither →  │
+│          │  + typing cursor        │  LLM Audit → PoC   │
+│          │                         │  Gen → Forge Test   │
+│          ├─────────────────────────┤  → Verdict          │
+│          │  Upload / Example       │                     │
+└──────────┴─────────────────────────┴────────────────────┘
+```
+
+- **Backend**: FastAPI + OpenAI-compatible LLM (claude_sonnet4_5) + Slither + Foundry
+- **Frontend**: React 19 + Vite + Tailwind CSS v4 + TypeScript
 
 ## Quick Start
 
-```bash
-conda activate ethbeijing
-python -m pip install -r requirements.txt
-uvicorn scripts.app:app --reload --host 0.0.0.0 --port 8000
+### Prerequisites
+
+- Python 3.12+
+- Node.js 18+
+- [Foundry](https://book.getfoundry.sh/) (optional, for real PoC execution)
+
+### 1. Environment
+
+Copy `.env.example` or create `.env` in the project root:
+
+```env
+OPENAI_API_KEY=your_api_key
+OPENAI_BASE_URL=https://your-llm-endpoint/v1
+OPENAI_MODEL=claude_sonnet4_5
 ```
 
-## Environment
-
-Python:
-
-```bash
-Python 3.12.13
-```
-
-Python packages:
-
-```bash
-pip3 install -r requirements.txt
-```
-
-Foundry is required only for real PoC execution. It is not a pip package.
-Install it with the official `foundryup` installer:
+### 2. Backend
 
 ```bash
-curl -L https://foundry.paradigm.xyz | bash
-source ~/.bashrc
-foundryup
+pip install -r requirements.txt
+uvicorn scripts.app:app --reload --port 8000
 ```
 
-Verify installation:
+### 3. Frontend
 
 ```bash
-forge --version
-cast --version
-anvil --version
+cd frontend
+npm install
+npm run dev
 ```
 
-If `forge` is not installed, the backend can still run structure extraction,
-CFG extraction, Slither detection, LLM audit, and example replay. Real
-`/api/projects/{project_id}/verify` execution requires `forge`.
+Open http://localhost:5173
 
-LLM credentials are supplied by the frontend in each LLM request. The backend
-does not read local `OPENAI_API_KEY`, `OPENAI_BASE_URL`, or `OPENAI_MODEL`
-environment variables.
+## Audit Pipeline
 
-## API
+| Phase | Description |
+|-------|-------------|
+| **Parse** | Extract contracts, functions, and structure from Solidity source |
+| **Slither** | Static analysis via Slither (skipped if not installed) |
+| **LLM Audit** | Streaming AI security audit with vulnerability detection |
+| **PoC Generation** | AI generates Foundry test to verify top vulnerability |
+| **Forge Test** | Compile & execute PoC with auto-repair loop (up to 3 rounds) |
+| **Verdict** | `exists` / `not_exists` / `failed` |
 
-- `GET /api/health`
-- `GET /api/examples`
-- `POST /api/projects/example/{case_id}`
-- `POST /api/projects` with a zip file field named `file`
-- `GET /api/projects/{project_id}/structure`
-- `POST /api/projects/{project_id}/detect` with `{"tool":"slither"}` or `{"tool":"llm","llm":{...}}`
-- `POST /api/projects/{project_id}/verify`
-- `POST /api/examples/{case_id}/replay`
-- `GET /api/jobs/{job_id}`
-- `GET /api/jobs/{job_id}/events`
+All phases stream SSE events to the frontend in real-time.
 
-LLM request shape:
+## API Endpoints
 
-```json
-{
-  "tool": "llm",
-  "llm": {
-    "api_key": "user-input-key",
-    "model": "gpt-4o-mini",
-    "base_url": "https://api.openai.com/v1"
-  }
-}
-```
-
-Verification request shape:
-
-```json
-{
-  "description": "audit report excerpt selected by the user",
-  "target_file": "src/BNRG.sol",
-  "target_function": "transferFrom",
-  "llm": {
-    "api_key": "user-input-key",
-    "model": "gpt-4o-mini",
-    "base_url": "https://api.openai.com/v1"
-  }
-}
-```
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/health` | Health check |
+| GET | `/api/examples` | List built-in example cases |
+| POST | `/api/projects` | Upload .zip Solidity project |
+| POST | `/api/projects/example/{case_id}` | Create project from example |
+| GET | `/api/projects/{id}/structure` | Parse contract structure |
+| GET | `/api/projects/{id}/audit/stream` | **SSE** full audit pipeline |
+| GET | `/api/examples/{case_id}/stream` | **SSE** replay example audit |
+| POST | `/api/projects/{id}/detect` | Run Slither or LLM detection |
+| POST | `/api/projects/{id}/verify` | Start PoC verification job |
+| GET | `/api/jobs/{id}` | Get job status |
 
 ## Demo Data
 
-The `example/` directory contains two curated validation cases:
+Two curated cases in `example/`:
 
-- `binamon-dos`
-- `cleverminu-approve-race`
+- **cleverminu-approve-race** — ERC20 approve race condition (double-spend)
+- **binamon-dos** — Denial of service vulnerability
 
-If `forge` is installed, verification jobs run real Foundry tests. If `forge` is
-not installed, use `/api/examples/{case_id}/replay` to return the same event
-shape from the saved example generation and test logs.
+## Project Structure
+
+```
+├── scripts/             # Backend (FastAPI)
+│   ├── app.py           # API routes + SSE endpoints
+│   ├── pipeline.py      # Streaming audit orchestrator
+│   ├── llm_client.py    # OpenAI-compatible LLM client (sync + stream)
+│   ├── detectors.py     # Slither + LLM vulnerability detection
+│   ├── poc_agent.py     # PoC generation with repair loop
+│   ├── foundry_runner.py# Forge test execution
+│   ├── solidity_parser.py# Regex-based Solidity parser
+│   ├── slither_cfg.py   # Slither-based CFG extraction
+│   ├── project_store.py # Project upload/storage
+│   ├── models.py        # Pydantic models
+│   └── config.py        # Environment config
+├── frontend/            # Frontend (React + Vite)
+│   └── src/
+│       ├── App.tsx
+│       ├── hooks/useAuditStream.ts  # SSE streaming hook
+│       └── components/
+│           ├── StreamPanel.tsx      # Streaming LLM output
+│           ├── FlowPanel.tsx        # Pipeline visualization
+│           ├── UploadArea.tsx       # Upload + example selection
+│           └── Sidebar.tsx          # Navigation
+├── example/             # Built-in audit cases
+└── requirements.txt
+```

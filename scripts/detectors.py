@@ -5,6 +5,7 @@ import subprocess
 import uuid
 from pathlib import Path
 
+from .config import default_llm_config
 from .llm_client import chat, extract_fenced
 from .models import DetectResponse, LLMConfig, Vulnerability
 from .solidity_parser import parse_structure
@@ -64,7 +65,10 @@ def run_slither(project_id: str, project_root: Path) -> DetectResponse:
 
 def run_llm_audit(project_id: str, project_root: Path, llm: LLMConfig | None) -> DetectResponse:
     if llm is None:
-        return DetectResponse(project_id=project_id, tool="llm", error="llm config is required for LLM audit")
+        try:
+            llm = default_llm_config()
+        except RuntimeError as exc:
+            return DetectResponse(project_id=project_id, tool="llm", error=str(exc))
     structure = parse_structure(project_id, project_root)
     snippets = []
     for contract in structure.contracts[:8]:
