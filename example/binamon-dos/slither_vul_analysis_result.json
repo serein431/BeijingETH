@@ -1,0 +1,127 @@
+[
+  {
+    "check": "shadowing-local",
+    "impact": "Low",
+    "confidence": "High",
+    "description": "Local parameter shadowing in BNRG.transferFrom: the parameter named `owner` hides the inherited `Ownable.owner()` function name inside this function scope. This does not by itself create the restricted-mode DoS exploit, but it makes ownership-related code easier to misread and can confuse manual review or tooling when reasoning about the caller, token owner, and contract owner.",
+    "locations": [
+      {
+        "file": "example/binamon-dos/src/BNRG.sol",
+        "line_start": 111,
+        "line_end": 125,
+        "label": "shadowing parameter in transferFrom",
+        "contract_content": "111:     function transferFrom(address owner, address receiver, uint256 numTokens) public override launchRestrict(owner, receiver, numTokens) returns (bool) {\n112:         require(numTokens <= balances[owner]);    \n113:         require(boosterBuyingAllowed[owner] == msg.sender || numTokens <= allowed[owner][msg.sender]);\n114:     \n115:         balances[owner] = balances[owner].sub(numTokens);\n116:         if (boosterBuyingAllowed[owner] != msg.sender) {\n117:             allowed[owner][msg.sender] = allowed[owner][msg.sender].sub(numTokens);\n118:             balances[receiver] = balances[receiver].add(numTokens);\n119:             emit Transfer(owner, receiver, numTokens);\n120:         } else {\n121:             _totalSupply = _totalSupply.sub(numTokens);\n122:             emit Transfer(owner, address(0), numTokens);\n123:         }\n124:         return true;\n125:     }"
+      },
+      {
+        "file": "example/binamon-dos/src/BNRG.sol",
+        "line_start": 23,
+        "line_end": 25,
+        "label": "shadowed Ownable.owner function",
+        "contract_content": "23:     function owner() public view returns (address) {\n24:         return _owner;\n25:     }"
+      }
+    ]
+  },
+  {
+    "check": "shadowing-local",
+    "impact": "Low",
+    "confidence": "High",
+    "description": "Local parameter shadowing in BNRG.allowance: the `owner` parameter shadows the inherited `Ownable.owner()` function name. The function is a read-only allowance lookup, so the direct security impact is low, but the naming collision can obscure whether code is referring to an ERC20 token holder or the privileged contract owner.",
+    "locations": [
+      {
+        "file": "example/binamon-dos/src/BNRG.sol",
+        "line_start": 107,
+        "line_end": 109,
+        "label": "shadowing parameter in allowance",
+        "contract_content": "107:     function allowance(address owner, address delegate) public override view returns (uint256) {\n108:         return allowed[owner][delegate];\n109:     }"
+      },
+      {
+        "file": "example/binamon-dos/src/BNRG.sol",
+        "line_start": 23,
+        "line_end": 25,
+        "label": "shadowed Ownable.owner function",
+        "contract_content": "23:     function owner() public view returns (address) {\n24:         return _owner;\n25:     }"
+      }
+    ]
+  },
+  {
+    "check": "shadowing-local",
+    "impact": "Low",
+    "confidence": "High",
+    "description": "Local parameter shadowing in BNRG.boosterBuyingAllowance(address,address): the `owner` parameter shadows `Ownable.owner()`. The function checks booster-buying delegation for a token holder, but the reused name can make review of privileged ownership logic less clear.",
+    "locations": [
+      {
+        "file": "example/binamon-dos/src/BNRG.sol",
+        "line_start": 131,
+        "line_end": 134,
+        "label": "shadowing parameter in two-argument boosterBuyingAllowance",
+        "contract_content": "131:     function boosterBuyingAllowance(address owner, address delegate) public view returns (bool) {\n132:         if (boosterBuyingAllowed[owner] == delegate) return true;\n133:         else return false;\n134:     }"
+      },
+      {
+        "file": "example/binamon-dos/src/BNRG.sol",
+        "line_start": 23,
+        "line_end": 25,
+        "label": "shadowed Ownable.owner function",
+        "contract_content": "23:     function owner() public view returns (address) {\n24:         return _owner;\n25:     }"
+      }
+    ]
+  },
+  {
+    "check": "shadowing-local",
+    "impact": "Low",
+    "confidence": "High",
+    "description": "Local parameter shadowing in BNRG.boosterBuyingAllowance(address): the `owner` parameter shadows `Ownable.owner()`. The one-argument helper forwards to the two-argument overload with `msg.sender`; the naming collision is low impact but reduces clarity around token-owner versus contract-owner semantics.",
+    "locations": [
+      {
+        "file": "example/binamon-dos/src/BNRG.sol",
+        "line_start": 127,
+        "line_end": 129,
+        "label": "shadowing parameter in one-argument boosterBuyingAllowance",
+        "contract_content": "127:     function boosterBuyingAllowance(address owner) public view returns (bool) {\n128:         return boosterBuyingAllowance(owner, msg.sender);\n129:     }"
+      },
+      {
+        "file": "example/binamon-dos/src/BNRG.sol",
+        "line_start": 23,
+        "line_end": 25,
+        "label": "shadowed Ownable.owner function",
+        "contract_content": "23:     function owner() public view returns (address) {\n24:         return _owner;\n25:     }"
+      }
+    ]
+  },
+  {
+    "check": "events-access",
+    "impact": "Low",
+    "confidence": "Medium",
+    "description": "Missing ownership-transfer event: Ownable.transferOwnership updates `_owner` but does not emit an `OwnershipTransferred` event. Off-chain monitoring, dashboards, and incident response tooling may miss ownership changes even though access control state changes successfully.",
+    "locations": [
+      {
+        "file": "example/binamon-dos/src/BNRG.sol",
+        "line_start": 32,
+        "line_end": 35,
+        "label": "ownership update without event emission",
+        "contract_content": "32:     function transferOwnership(address newOwner) public virtual onlyOwner {\n33:         require(newOwner != address(0), \"Ownable: new owner is the zero address\");\n34:         _owner = newOwner;\n35:     }"
+      }
+    ]
+  },
+  {
+    "check": "missing-zero-check",
+    "impact": "Low",
+    "confidence": "Medium",
+    "description": "Missing zero-address validation in BNRG.setStakingContract: the owner can set `stakingContractAddress` to `address(0)`. Because `deliver` later requires `msg.sender == stakingContractAddress`, setting the zero address effectively disables legitimate staking reward delivery until corrected.",
+    "locations": [
+      {
+        "file": "example/binamon-dos/src/BNRG.sol",
+        "line_start": 141,
+        "line_end": 142,
+        "label": "unchecked staking contract assignment",
+        "contract_content": "141:     function setStakingContract(address stakingContractAddress_) public onlyOwner {\n142:         stakingContractAddress = stakingContractAddress_;"
+      },
+      {
+        "file": "example/binamon-dos/src/BNRG.sol",
+        "line_start": 145,
+        "line_end": 149,
+        "label": "staking contract address used as authorization gate",
+        "contract_content": "145:     function deliver(address user, uint256 numTokens) public {\n146:         require(msg.sender == stakingContractAddress, \"Manual call not allowed\");\n147:         balances[user] = balances[user].add(numTokens);\n148:         _totalSupply = _totalSupply.add(numTokens);\n149:         emit Transfer(address(0), user, numTokens);"
+      }
+    ]
+  }
+]
