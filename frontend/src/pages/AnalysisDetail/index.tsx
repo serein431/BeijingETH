@@ -4,27 +4,51 @@ import FunctionSidebar from "./components/FunctionSidebar";
 import CodeViewer from "./components/CodeViewer";
 import FunctionMeta from "./components/FunctionMeta";
 import CfgGraph from "./components/CfgGraph";
+import SlitherResults from "./components/SlitherResults";
+import ForgeOutput from "./components/ForgeOutput";
 import { useAnalysisData } from "./hooks/useAnalysisData";
 import "./styles.css";
-import type { AnalysisTab, CallGraphEntry } from "./types";
+import type {
+  AnalysisTab,
+  CallGraphEntry,
+  SlitherVulnerability,
+} from "./types";
 
 function TabButton({
   active,
   onClick,
   children,
+  badge,
+  badgeAccent,
 }: {
   active: boolean;
   onClick: () => void;
   children: React.ReactNode;
+  badge?: number | null;
+  badgeAccent?: "red" | "amber" | "emerald" | "zinc";
 }) {
+  const accentMap: Record<string, string> = {
+    red: "bg-red-500/20 text-red-300 border-red-500/40",
+    amber: "bg-amber-500/20 text-amber-300 border-amber-500/40",
+    emerald: "bg-emerald-500/20 text-emerald-300 border-emerald-500/40",
+    zinc: "bg-white/[0.06] text-zinc-300 border-white/10",
+  };
+  const cls = badgeAccent ? accentMap[badgeAccent] : accentMap.zinc;
   return (
     <button
       type="button"
       data-active={active}
       onClick={onClick}
-      className="analysis-tab"
+      className="analysis-tab inline-flex items-center gap-1.5"
     >
-      {children}
+      <span>{children}</span>
+      {typeof badge === "number" && badge > 0 && (
+        <span
+          className={`inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full border text-[10px] font-mono tabular-nums ${cls}`}
+        >
+          {badge}
+        </span>
+      )}
     </button>
   );
 }
@@ -99,13 +123,37 @@ function MenuIcon() {
   );
 }
 
+function getHighestSeverityAccent(
+  vulns: SlitherVulnerability[] | null | undefined
+): "red" | "amber" | "emerald" | "zinc" {
+  if (!vulns || vulns.length === 0) return "zinc";
+  const impacts = vulns.map((v) => (v.impact || "").toLowerCase());
+  if (impacts.some((i) => i === "high")) return "red";
+  if (impacts.some((i) => i === "medium")) return "amber";
+  if (impacts.some((i) => i === "low")) return "emerald";
+  return "zinc";
+}
+
 export default function AnalysisDetail() {
-  const { cfgData, functionSources, loading, error, caseId } =
-    useAnalysisData();
+  const [caseId, setCaseId] = useState<string>("binamon-dos");
+  const {
+    cfgData,
+    functionSources,
+    slitherResults,
+    forgeOutput,
+    loading,
+    error,
+  } = useAnalysisData(caseId);
   const [activeTab, setActiveTab] = useState<AnalysisTab>("detail");
   const [selectedFunction, setSelectedFunction] = useState<string | null>(null);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
+
+  // Reset selected function when example changes; new example has different
+  // call graph / function list and the previous signature won't match.
+  useEffect(() => {
+    setSelectedFunction(null);
+  }, [caseId]);
 
   // Auto-select the first non-interface function once data is loaded.
   useEffect(() => {
@@ -141,16 +189,30 @@ export default function AnalysisDetail() {
 
   const handleSelect = (sig: string) => {
     setSelectedFunction(sig);
-    // On small screens, close the drawer after selecting.
     if (drawerOpen) setDrawerOpen(false);
   };
 
+  const handleExampleChange = (next: string) => {
+    if (next === caseId) return;
+    setCaseId(next);
+    setSelectedFunction(null);
+    setDrawerOpen(false);
+  };
+
+  const vulnCount = slitherResults?.length ?? 0;
+  const vulnAccent = getHighestSeverityAccent(slitherResults);
+  const showSidebar = activeTab === "detail" || activeTab === "graph";
+
   return (
     <div className="analysis-shell">
-      <ContractHeader cfgData={cfgData} caseId={caseId} />
+      <ContractHeader
+        cfgData={cfgData}
+        caseId={caseId}
+        onExampleChange={handleExampleChange}
+      />
 
       <div className="analysis-body">
-        {drawerOpen && (
+        {drawerOpen && showSidebar && (
           <div
             className="analysis-sidebar-backdrop"
             onClick={() => setDrawerOpen(false)}
@@ -158,28 +220,32 @@ export default function AnalysisDetail() {
           />
         )}
 
-        <FunctionSidebar
-          cfgData={cfgData}
-          functionSources={functionSources}
-          selectedSignature={selectedFunction}
-          onSelect={handleSelect}
-          collapsed={sidebarCollapsed}
-          onToggleCollapse={() => setSidebarCollapsed((v) => !v)}
-          drawerOpen={drawerOpen}
-        />
+        {showSidebar && (
+          <FunctionSidebar
+            cfgData={cfgData}
+            functionSources={functionSources}
+            selectedSignature={selectedFunction}
+            onSelect={handleSelect}
+            collapsed={sidebarCollapsed}
+            onToggleCollapse={() => setSidebarCollapsed((v) => !v)}
+            drawerOpen={drawerOpen}
+          />
+        )}
 
         <div className="analysis-main">
           <div className="px-6 py-3 border-b border-white/[0.05] flex items-center justify-between gap-3 flex-wrap">
             <div className="flex items-center gap-3">
-              <button
-                type="button"
-                className="analysis-drawer-trigger"
-                onClick={() => setDrawerOpen(true)}
-                aria-label="Open function list"
-              >
-                <MenuIcon />
-                <span>Functions</span>
-              </button>
+              {showSidebar && (
+                <button
+                  type="button"
+                  className="analysis-drawer-trigger"
+                  onClick={() => setDrawerOpen(true)}
+                  aria-label="Open function list"
+                >
+                  <MenuIcon />
+                  <span>Functions</span>
+                </button>
+              )}
               <div className="analysis-tabs">
                 <TabButton
                   active={activeTab === "detail"}
@@ -193,50 +259,82 @@ export default function AnalysisDetail() {
                 >
                   Call Graph
                 </TabButton>
+                <TabButton
+                  active={activeTab === "vulnerabilities"}
+                  onClick={() => setActiveTab("vulnerabilities")}
+                  badge={vulnCount}
+                  badgeAccent={vulnAccent}
+                >
+                  Vulnerabilities
+                </TabButton>
+                <TabButton
+                  active={activeTab === "execution"}
+                  onClick={() => setActiveTab("execution")}
+                >
+                  Execution
+                </TabButton>
               </div>
             </div>
 
-            <div className="flex items-center gap-3 text-[11px] text-zinc-500 min-w-0">
+            <div className="flex items-center gap-3 text-[11px] font-medium text-zinc-400 min-w-0">
               {loading && (
                 <>
                   <span className="analysis-loader" />
-                  <span>Loading analysis…</span>
+                  <span className="font-semibold">Loading analysis…</span>
                 </>
               )}
               {error && (
-                <span className="text-rose-400 font-mono truncate" title={error}>
+                <span className="text-rose-400 font-mono font-semibold truncate" title={error}>
                   ! {error}
                 </span>
               )}
-              {!loading && !error && selectedEntry && (
-                <span className="font-mono truncate max-w-[360px]">
+              {!loading && !error && selectedEntry && showSidebar && (
+                <span className="font-mono font-semibold text-zinc-300 truncate max-w-[360px]">
                   {selectedEntry.contract}.{selectedEntry.full_name}
+                </span>
+              )}
+              {!loading && !error && activeTab === "vulnerabilities" && (
+                <span className="font-mono font-semibold text-zinc-300 truncate max-w-[360px]">
+                  {vulnCount} finding{vulnCount === 1 ? "" : "s"}
+                </span>
+              )}
+              {!loading && !error && activeTab === "execution" && (
+                <span className="font-mono font-semibold text-zinc-300 truncate max-w-[360px]">
+                  forge run output
                 </span>
               )}
             </div>
           </div>
 
           <div className="analysis-content">
-            {activeTab === "detail" ? (
-              <FunctionDetailView
-                entry={selectedEntry}
-                onJump={handleJump}
-              />
-            ) : cfgData ? (
-              <CfgGraph
-                callGraph={cfgData.call_graph}
-                selectedFunction={selectedFunction}
-                onNodeClick={(sig) => {
-                  setSelectedFunction(sig);
-                }}
-              />
-            ) : (
-              <div className="analysis-empty">
-                <div className="analysis-empty-glyph">→</div>
-                <div>
-                  {loading ? "Loading call graph…" : "No call graph data."}
+            {activeTab === "detail" && (
+              <FunctionDetailView entry={selectedEntry} onJump={handleJump} />
+            )}
+
+            {activeTab === "graph" &&
+              (cfgData ? (
+                <CfgGraph
+                  callGraph={cfgData.call_graph}
+                  selectedFunction={selectedFunction}
+                  onNodeClick={(sig) => {
+                    setSelectedFunction(sig);
+                  }}
+                />
+              ) : (
+                <div className="analysis-empty">
+                  <div className="analysis-empty-glyph">→</div>
+                  <div>
+                    {loading ? "Loading call graph…" : "No call graph data."}
+                  </div>
                 </div>
-              </div>
+              ))}
+
+            {activeTab === "vulnerabilities" && (
+              <SlitherResults vulnerabilities={slitherResults || []} />
+            )}
+
+            {activeTab === "execution" && (
+              <ForgeOutput output={forgeOutput || ""} />
             )}
           </div>
         </div>

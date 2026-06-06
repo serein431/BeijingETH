@@ -139,9 +139,9 @@ export default function FunctionSidebar({
               className="w-full pl-9 pr-3 py-2 text-sm rounded-lg bg-black/40 border border-white/[0.06] text-zinc-200 placeholder:text-zinc-500 focus:outline-none focus:border-indigo-500/60 focus:bg-black/60 transition-all duration-200"
             />
           </div>
-          <div className="mt-2 flex items-center justify-between text-[10px] uppercase tracking-[0.18em] text-zinc-500">
+          <div className="mt-2 flex items-center justify-between text-[10px] font-semibold uppercase tracking-[0.18em] text-zinc-400">
             <span>Functions</span>
-            <span className="font-mono text-zinc-400">{totalShown}</span>
+            <span className="font-mono font-bold text-zinc-300">{totalShown}</span>
           </div>
         </div>
 
@@ -151,14 +151,14 @@ export default function FunctionSidebar({
               <div className="w-10 h-10 rounded-xl border border-dashed border-white/[0.12] flex items-center justify-center text-zinc-600 font-mono text-xs">
                 ∅
               </div>
-              <div className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
+              <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-400">
                 {query ? "No matches" : "No functions"}
               </div>
               {query && (
                 <button
                   type="button"
                   onClick={() => setQuery("")}
-                  className="text-[10px] font-mono text-indigo-300/80 hover:text-indigo-200 underline-offset-2 hover:underline"
+                  className="text-[10px] font-mono font-semibold text-indigo-300/90 hover:text-indigo-200 underline-offset-2 hover:underline"
                 >
                   clear filter
                 </button>
@@ -183,11 +183,11 @@ export default function FunctionSidebar({
                     >
                       <path d="M3 4l3 4 3-4z" />
                     </svg>
-                    <span className="font-semibold text-[11px] uppercase tracking-[0.16em] text-zinc-200 truncate">
+                    <span className="font-bold text-[11px] uppercase tracking-[0.16em] text-zinc-100 truncate">
                       {group.contract}
                     </span>
                   </div>
-                  <span className="font-mono text-[10px] text-zinc-500 group-hover:text-zinc-300">
+                  <span className="font-mono font-semibold text-[10px] text-zinc-400 group-hover:text-zinc-200">
                     {group.entries.length}
                   </span>
                 </button>
@@ -206,8 +206,8 @@ export default function FunctionSidebar({
                             data-active={active ? "true" : "false"}
                             className={`analysis-fn-row w-full text-left pl-7 pr-3 py-1.5 font-mono text-[12px] truncate border-l-2 ${
                               active
-                                ? "border-indigo-400 bg-indigo-500/[0.08] text-indigo-200"
-                                : "border-transparent text-zinc-400 hover:border-white/20 hover:bg-white/[0.02] hover:text-zinc-200"
+                                ? "border-indigo-400 bg-indigo-500/[0.08] font-semibold text-indigo-200"
+                                : "border-transparent font-medium text-zinc-300 hover:border-white/20 hover:bg-white/[0.02] hover:text-zinc-100"
                             }`}
                             title={entry.signature}
                           >

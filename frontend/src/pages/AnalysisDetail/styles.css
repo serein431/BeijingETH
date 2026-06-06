@@ -921,3 +921,59 @@
   border-color: rgba(23, 22, 19, 0.12);
   border-top-color: var(--light-blue);
 }
+
+/* ============================================================
+ * Font-weight reinforcement
+ * Bump default text weight inside the analysis page so labels,
+ * paragraphs and meta info read clearly. Keep monospaced code
+ * and terminal output at their natural weight to preserve
+ * legibility of dense character columns.
+ * ============================================================ */
+.analysis-shell,
+.analysis-page {
+  font-weight: 500;
+}
+
+.analysis-shell h1,
+.analysis-shell h2,
+.analysis-shell h3,
+.analysis-page h1,
+.analysis-page h2,
+.analysis-page h3 {
+  font-weight: 700;
+  letter-spacing: -0.005em;
+}
+
+.analysis-shell button,
+.analysis-page button {
+  font-weight: 600;
+}
+
+.analysis-tab {
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.analysis-tab[data-active="true"] {
+  font-weight: 700;
+}
+
+/* Reset weight for code, terminal and pill labels that are font-mono */
+.analysis-shell pre,
+.analysis-shell pre *,
+.analysis-shell code,
+.analysis-codeviewer-wrap pre,
+.analysis-codeviewer-wrap pre *,
+.analysis-codeviewer-wrap code,
+.forge-terminal,
+.forge-terminal * {
+  font-weight: 400;
+}
+
+/* Keep deliberate emphasis on tokens that opted in via font-bold/font-semibold */
+.forge-terminal .font-bold,
+.forge-terminal .font-semibold,
+.analysis-codeviewer-wrap .font-bold,
+.analysis-codeviewer-wrap .font-semibold {
+  font-weight: 700;
+}

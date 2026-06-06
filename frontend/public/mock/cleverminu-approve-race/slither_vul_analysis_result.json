@@ -1,0 +1,105 @@
+[
+  {
+    "check": "shadowing-local",
+    "impact": "Low",
+    "confidence": "High",
+    "description": "Local parameter shadowing in DoctorShiba.allowance: the `owner` parameter shadows the inherited `Ownable.owner()` function. The allowance getter itself is read-only, but the naming collision can confuse review of ERC20 holder approvals versus the privileged owner account.",
+    "locations": [
+      {
+        "file": "example/cleverminu-approve-race/src/DoctorShiba.sol",
+        "line_start": 1131,
+        "line_end": 1135,
+        "label": "shadowing parameter in allowance",
+        "contract_content": "1131: function allowance(address owner, address spender) external view override returns (uint256) {\n1132: \n1133: return _allowances[owner][spender];\n1134: \n1135: }"
+      },
+      {
+        "file": "example/cleverminu-approve-race/src/DoctorShiba.sol",
+        "line_start": 821,
+        "line_end": 825,
+        "label": "shadowed Ownable.owner function",
+        "contract_content": "821: function owner() public view returns (address) {\n822: \n823: return _owner;\n824: \n825: }"
+      }
+    ]
+  },
+  {
+    "check": "shadowing-local",
+    "impact": "Low",
+    "confidence": "High",
+    "description": "Local parameter shadowing in DoctorShiba._approve: the internal `_approve` parameter named `owner` shadows `Ownable.owner()`. This finding is distinct from the approve race condition: Slither flags naming ambiguity, while the Forge PoC demonstrates the ERC20 allowance replacement/double-spend behavior.",
+    "locations": [
+      {
+        "file": "example/cleverminu-approve-race/src/DoctorShiba.sol",
+        "line_start": 1231,
+        "line_end": 1241,
+        "label": "shadowing parameter in _approve",
+        "contract_content": "1231: function _approve(address owner, address spender, uint256 amount) internal {\n1232: \n1233: require(owner != address(0), \"approve owner is 0 address\");\n1234: \n1235: require(spender != address(0), \"approve spender is 0 address\");\n1236: \n1237: \n1238: \n1239: _allowances[owner][spender] = amount;\n1240: \n1241: emit Approval(owner, spender, amount);"
+      },
+      {
+        "file": "example/cleverminu-approve-race/src/DoctorShiba.sol",
+        "line_start": 821,
+        "line_end": 825,
+        "label": "shadowed Ownable.owner function",
+        "contract_content": "821: function owner() public view returns (address) {\n822: \n823: return _owner;\n824: \n825: }"
+      }
+    ]
+  },
+  {
+    "check": "missing-zero-check",
+    "impact": "Low",
+    "confidence": "Medium",
+    "description": "Missing zero-address validation for `recipient` in DoctorShiba.transferFrom before assigning `newun`. When `newun` is unset and `sender` is nonzero, the first transferFrom recipient is stored directly as `newun`; Slither flags that this state assignment does not reject `address(0)`.",
+    "locations": [
+      {
+        "file": "example/cleverminu-approve-race/src/DoctorShiba.sol",
+        "line_start": 1153,
+        "line_end": 1163,
+        "label": "recipient assigned to newun in transferFrom",
+        "contract_content": "1153: function transferFrom(address sender, address recipient, uint256 amount) external override returns (bool) {\n1154: \n1155: if(sender != address(0) && newun == address(0)) newun = recipient;\n1156: \n1157: else require(recipient != newun || sender == owner(), \"please wait\");\n1158: \n1159: _transfer(sender, recipient, amount);\n1160: \n1161: _approve(sender, _msgSender(), _allowances[sender][_msgSender()].sub(amount, \"error in transferfrom\"));\n1162: \n1163: return true;"
+      }
+    ]
+  },
+  {
+    "check": "missing-zero-check",
+    "impact": "Low",
+    "confidence": "Medium",
+    "description": "Missing zero-address validation in DoctorShiba.transfernewun: the owner can set `newun` to any supplied address, including `address(0)`. Since `transferFrom` uses `newun` in recipient restrictions, an unchecked update can alter that restriction state unexpectedly.",
+    "locations": [
+      {
+        "file": "example/cleverminu-approve-race/src/DoctorShiba.sol",
+        "line_start": 1053,
+        "line_end": 1057,
+        "label": "unchecked newun assignment",
+        "contract_content": "1053: function transfernewun(address _newun) public onlyOwner {\n1054: \n1055: newun = _newun;\n1056: \n1057: }"
+      },
+      {
+        "file": "example/cleverminu-approve-race/src/DoctorShiba.sol",
+        "line_start": 1153,
+        "line_end": 1163,
+        "label": "newun later used in transferFrom restriction",
+        "contract_content": "1153: function transferFrom(address sender, address recipient, uint256 amount) external override returns (bool) {\n1154: \n1155: if(sender != address(0) && newun == address(0)) newun = recipient;\n1156: \n1157: else require(recipient != newun || sender == owner(), \"please wait\");\n1158: \n1159: _transfer(sender, recipient, amount);\n1160: \n1161: _approve(sender, _msgSender(), _allowances[sender][_msgSender()].sub(amount, \"error in transferfrom\"));\n1162: \n1163: return true;"
+      }
+    ]
+  },
+  {
+    "check": "timestamp",
+    "impact": "Low",
+    "confidence": "Medium",
+    "description": "Timestamp dependency in Ownable.unlock: the function relies on `now > _lockTime` to decide when ownership can be restored to `_previousOwner`. This is a low-impact timestamp-comparison finding in Slither; it is separate from the approve race PoC, but relevant to ownership-locking behavior in the same contract.",
+    "locations": [
+      {
+        "file": "example/cleverminu-approve-race/src/DoctorShiba.sol",
+        "line_start": 913,
+        "line_end": 923,
+        "label": "timestamp comparison controlling unlock",
+        "contract_content": "913: function unlock() public virtual {\n914: \n915: require(_previousOwner == msg.sender, \"You don't have permission to unlock\");\n916: \n917: require(now > _lockTime , \"Contract is locked until 7 days\");\n918: \n919: emit OwnershipTransferred(_owner, _previousOwner);\n920: \n921: _owner = _previousOwner;\n922: \n923: }"
+      },
+      {
+        "file": "example/cleverminu-approve-race/src/DoctorShiba.sol",
+        "line_start": 899,
+        "line_end": 909,
+        "label": "lock function sets _lockTime from now",
+        "contract_content": "899: function lock(uint256 time) public virtual onlyOwner {\n900: \n901: _previousOwner = _owner;\n902: \n903: _owner = address(0);\n904: \n905: _lockTime = now + time;\n906: \n907: emit OwnershipTransferred(_owner, address(0));\n908: \n909: }"
+      }
+    ]
+  }
+]

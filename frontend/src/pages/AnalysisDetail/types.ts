@@ -37,4 +37,21 @@ export interface FunctionSource {
 
 export type FunctionSources = Record<string, FunctionSource>;
 
-export type AnalysisTab = "detail" | "graph";
+// Slither 漏洞分析结果
+export interface VulnLocation {
+  file: string;
+  line_start: number;
+  line_end: number;
+  label: string;
+  contract_content: string;
+}
+
+export interface SlitherVulnerability {
+  check: string;
+  impact: string; // "High" | "Medium" | "Low" | "Informational"
+  confidence: string; // "High" | "Medium" | "Low"
+  description: string;
+  locations: VulnLocation[];
+}
+
+export type AnalysisTab = "detail" | "graph" | "vulnerabilities" | "execution";

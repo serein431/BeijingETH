@@ -135,12 +135,12 @@ function MetaField({
 }) {
   return (
     <div className="flex flex-col gap-1.5 min-w-0">
-      <div className="flex items-center gap-1.5 text-zinc-500">
-        <span className="text-zinc-600">{icon}</span>
-        <span className="text-[10px] uppercase tracking-[0.22em]">{label}</span>
+      <div className="flex items-center gap-1.5 text-zinc-400">
+        <span className="text-zinc-500">{icon}</span>
+        <span className="text-[10px] font-semibold uppercase tracking-[0.22em]">{label}</span>
       </div>
       <div
-        className={`text-[12.5px] text-zinc-200 truncate ${
+        className={`text-[12.5px] font-medium text-zinc-100 truncate ${
           mono ? "font-mono" : ""
         }`}
         title={title ?? value}
@@ -165,10 +165,10 @@ function CallPill({
       onClick={() => onClick?.(signature)}
       disabled={!interactive}
       title={signature}
-      className={`group inline-flex items-center gap-1 max-w-full px-2 py-1 rounded-md text-[11px] font-mono border transition-all duration-150 ${
+      className={`group inline-flex items-center gap-1 max-w-full px-2 py-1 rounded-md text-[11px] font-mono font-medium border transition-all duration-150 ${
         interactive
-          ? "bg-zinc-800/60 border-white/[0.06] text-zinc-300 hover:bg-zinc-700/70 hover:border-indigo-400/40 hover:text-indigo-200 cursor-pointer"
-          : "bg-zinc-800/40 border-white/[0.04] text-zinc-400 cursor-default"
+          ? "bg-zinc-800/60 border-white/[0.06] text-zinc-200 hover:bg-zinc-700/70 hover:border-indigo-400/40 hover:text-indigo-200 cursor-pointer"
+          : "bg-zinc-800/40 border-white/[0.04] text-zinc-300 cursor-default"
       }`}
     >
       <span className="truncate">{shortName(signature)}</span>
@@ -208,17 +208,17 @@ function CallSection({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className={`w-1.5 h-1.5 rounded-full ${accentDot}`} />
-          <span className={`text-zinc-500 ${accentText}`}>{icon}</span>
-          <span className="text-[10px] uppercase tracking-[0.22em] text-zinc-400">
+          <span className={`text-zinc-400 ${accentText}`}>{icon}</span>
+          <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-zinc-300">
             {title}
           </span>
         </div>
-        <span className="font-mono text-[10px] text-zinc-500">
+        <span className="font-mono font-bold text-[10px] text-zinc-400">
           {count.toString().padStart(2, "0")}
         </span>
       </div>
       {items.length === 0 ? (
-        <div className="text-[11px] font-mono text-zinc-600 italic pl-3.5">
+        <div className="text-[11px] font-mono font-medium text-zinc-500 italic pl-3.5">
           {empty}
         </div>
       ) : (
@@ -262,36 +262,36 @@ export default function FunctionMeta({
       <div className="relative p-5 space-y-5">
         {/* Header */}
         <div className="space-y-2">
-          <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.22em] text-zinc-500">
-            <span className="font-mono text-indigo-300/70">▸</span>
+          <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-zinc-400">
+            <span className="font-mono text-indigo-300/80">▸</span>
             <span>Function</span>
-            <span className="font-mono text-zinc-700">·</span>
-            <span className="font-mono text-zinc-500 normal-case tracking-normal">
+            <span className="font-mono text-zinc-600">·</span>
+            <span className="font-mono text-zinc-400 normal-case tracking-normal">
               {contractName}
             </span>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <h2 className="text-lg font-semibold text-white font-mono leading-tight break-all">
-              <span className="text-zinc-500">{contractName}</span>
-              <span className="text-zinc-600">.</span>
+            <h2 className="text-lg font-bold text-white font-mono leading-tight break-all">
+              <span className="text-zinc-400">{contractName}</span>
+              <span className="text-zinc-500">.</span>
               <span>{functionName}</span>
             </h2>
             {isModifier && (
-              <span className="text-[10px] uppercase tracking-[0.18em] bg-amber-500/20 text-amber-300 border border-amber-400/30 rounded-full px-2 py-0.5 font-mono">
+              <span className="text-[10px] font-bold uppercase tracking-[0.18em] bg-amber-500/20 text-amber-300 border border-amber-400/30 rounded-full px-2 py-0.5 font-mono">
                 modifier
               </span>
             )}
-            <span className="text-[10px] uppercase tracking-[0.18em] bg-indigo-500/20 text-indigo-300 border border-indigo-400/30 rounded-full px-2 py-0.5 font-mono">
+            <span className="text-[10px] font-bold uppercase tracking-[0.18em] bg-indigo-500/20 text-indigo-300 border border-indigo-400/30 rounded-full px-2 py-0.5 font-mono">
               {fullName}
             </span>
           </div>
 
           <div
-            className="text-[11.5px] font-mono text-zinc-400 break-all bg-black/30 border border-white/[0.04] rounded-md px-3 py-2"
+            className="text-[11.5px] font-mono font-medium text-zinc-300 break-all bg-black/30 border border-white/[0.04] rounded-md px-3 py-2"
             title={signature}
           >
-            <span className="text-zinc-600 select-none">sig » </span>
+            <span className="text-zinc-500 select-none font-semibold">sig » </span>
             {signature}
           </div>
         </div>

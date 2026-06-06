@@ -1,9 +1,11 @@
 import { Link } from "react-router-dom";
 import type { CfgData } from "../types";
+import ExampleSelector from "./ExampleSelector";
 
 interface ContractHeaderProps {
   cfgData: CfgData | null;
   caseId: string;
+  onExampleChange: (caseId: string) => void;
 }
 
 function StatChip({
@@ -27,17 +29,18 @@ function StatChip({
     <div
       className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border backdrop-blur ${cls}`}
     >
-      <span className="text-[10px] uppercase tracking-[0.18em] opacity-70">
+      <span className="text-[10px] font-semibold uppercase tracking-[0.18em] opacity-80">
         {label}
       </span>
-      <span className="font-mono text-sm tabular-nums">{value}</span>
+      <span className="font-mono text-sm font-bold tabular-nums">{value}</span>
     </div>
   );
 }
 
 export default function ContractHeader({
   cfgData,
-  caseId: _caseId,
+  caseId,
+  onExampleChange,
 }: ContractHeaderProps) {
   const contractCount = cfgData?.contracts.length ?? 0;
   const functionCount = cfgData
@@ -68,45 +71,48 @@ export default function ContractHeader({
               d="M15 19l-7-7 7-7"
             />
           </svg>
-          <span className="text-xs font-medium tracking-wide">Back</span>
+          <span className="text-xs font-semibold tracking-wide">Back</span>
         </Link>
 
         <div className="min-w-0">
-          <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.22em] text-zinc-500">
+          <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-zinc-400">
             <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400/80 animate-pulse" />
             Project Structure
           </div>
           <div className="mt-0.5 flex items-baseline gap-2">
-            <h1 className="font-mono text-lg text-zinc-100 truncate">
+            <h1 className="font-mono text-lg font-bold text-zinc-100 truncate">
               {projectLabel}
             </h1>
-            <span className="text-xs text-zinc-500 truncate">
+            <span className="text-xs font-medium text-zinc-400 truncate">
               {cfgData ? `${cfgData.solc_constraint} · parsed workspace` : "—"}
             </span>
           </div>
         </div>
       </div>
 
-      <div className="flex items-center gap-2 shrink-0">
-        <StatChip
-          label="Contracts"
-          value={contractCount}
-          accent="indigo"
-        />
-        <StatChip
-          label="Functions"
-          value={functionCount}
-          accent="emerald"
-        />
-        <StatChip
-          label="State"
-          value={stateVarCount}
-          accent="amber"
-        />
-        <StatChip
-          label="solc"
-          value={cfgData ? cfgData.solc_version : "—"}
-        />
+      <div className="flex items-center gap-3 shrink-0">
+        <ExampleSelector currentCase={caseId} onChange={onExampleChange} />
+        <div className="flex items-center gap-2">
+          <StatChip
+            label="Contracts"
+            value={contractCount}
+            accent="indigo"
+          />
+          <StatChip
+            label="Functions"
+            value={functionCount}
+            accent="emerald"
+          />
+          <StatChip
+            label="State"
+            value={stateVarCount}
+            accent="amber"
+          />
+          <StatChip
+            label="solc"
+            value={cfgData ? cfgData.solc_version : "—"}
+          />
+        </div>
       </div>
     </header>
   );
