@@ -162,13 +162,13 @@ def audit_stream(project_id: str):
 
 
 @app.get("/api/examples/{case_id}/stream")
-def example_stream(case_id: str):
+def example_stream(case_id: str, mode: str = "full_audit"):
     from .config import EXAMPLE_ROOT
     case_dir = (EXAMPLE_ROOT / case_id).resolve()
     if not case_dir.exists():
         raise HTTPException(status_code=404, detail=f"Unknown example: {case_id}")
     return StreamingResponse(
-        replay_as_stream(case_id),
+        replay_as_stream(case_id, mode),
         media_type="text/event-stream",
         headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
     )

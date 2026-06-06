@@ -214,27 +214,33 @@ def run_audit_pipeline(project_id: str, project_root: Path, llm: LLMConfig) -> G
     yield _sse("verdict", {"verdict": "failed", "message": "Verification failed after all repair rounds"})
 
 
-def replay_as_stream(case_id: str) -> Generator[str, None, None]:
+def replay_as_stream(case_id: str, mode: str = "full_audit") -> Generator[str, None, None]:
     from .example_replay import replay_events
 
     events, verdict = replay_events(case_id)
     case_dir = config.EXAMPLE_ROOT / case_id
     log_path = case_dir / "generation_repair_log.json"
 
+    verify_only = mode == "verify_finding"
+
     yield _sse("phase", {"phase": "parse", "status": "running", "message": "Loading example project..."})
     time.sleep(0.3)
     yield _sse("phase", {"phase": "parse", "status": "completed", "message": "Example project loaded"})
 
-    yield _sse("phase", {"phase": "slither", "status": "running", "message": "Running static analysis..."})
-    time.sleep(0.5)
-    yield _sse("phase", {"phase": "slither", "status": "completed", "message": "Static analysis complete"})
+    if verify_only:
+        yield _sse("phase", {"phase": "slither", "status": "skipped", "message": "Existing report supplied"})
+        yield _sse("phase", {"phase": "llm_audit", "status": "skipped", "message": "Discovery skipped for report verification"})
+    else:
+        yield _sse("phase", {"phase": "slither", "status": "running", "message": "Running static analysis..."})
+        time.sleep(0.5)
+        yield _sse("phase", {"phase": "slither", "status": "completed", "message": "Static analysis complete"})
 
     if log_path.exists():
         data = json.loads(log_path.read_text(encoding="utf-8"))
         log_entries = data.get("log", [])
 
         audit_report_path = case_dir / "audit_report.md"
-        if audit_report_path.exists():
+        if audit_report_path.exists() and not verify_only:
             yield _sse("phase", {"phase": "llm_audit", "status": "running", "message": "Running LLM security audit..."})
             report_text = audit_report_path.read_text(encoding="utf-8", errors="ignore")
             for i in range(0, len(report_text), 8):

@@ -16,6 +16,7 @@ class ProjectSummary(BaseModel):
     status: str
     root: str
     files: list[str] = Field(default_factory=list)
+    replay_case: str | None = None
 
 
 class FunctionInfo(BaseModel):

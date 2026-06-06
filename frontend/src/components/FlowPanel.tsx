@@ -1,6 +1,13 @@
-import type { AuditState, PhaseState } from "../types";
+import {
+  createTranslator,
+  getPhaseLabel,
+  getStatusLabel,
+  translatePipelineMessage,
+} from "../i18n";
+import type { AuditState, Language, PhaseState } from "../types";
 
 interface Props {
+  language: Language;
   state: AuditState;
 }
 
@@ -47,7 +54,8 @@ const PHASE_ICONS: Record<string, React.ReactNode> = {
   ),
 };
 
-export default function FlowPanel({ state }: Props) {
+export default function FlowPanel({ language, state }: Props) {
+  const t = createTranslator(language);
   const hasVerdict = state.verdict !== null;
 
   return (
@@ -62,7 +70,7 @@ export default function FlowPanel({ state }: Props) {
               <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500" />
             </span>
           )}
-          Pipeline
+          {t("flow.pipeline")}
         </h2>
       </div>
 
@@ -112,13 +120,13 @@ export default function FlowPanel({ state }: Props) {
                               : "text-zinc-500"
                       }`}
                     >
-                      {phase.label}
+                      {getPhaseLabel(language, phase.name, phase.label)}
                     </span>
-                    <StatusBadge status={phase.status} />
+                    <StatusBadge language={language} status={phase.status} />
                   </div>
                   {phase.message && (
                     <p className="text-[11px] text-zinc-500 leading-relaxed mt-0.5 line-clamp-2">
-                      {phase.message}
+                      {translatePipelineMessage(language, phase.message)}
                     </p>
                   )}
                 </div>
@@ -135,7 +143,7 @@ export default function FlowPanel({ state }: Props) {
                     hasVerdict ? "text-white" : "text-zinc-500"
                   }`}
                 >
-                  Verdict
+                  {t("flow.verdict")}
                 </span>
                 {hasVerdict && (
                   <span
@@ -148,16 +156,16 @@ export default function FlowPanel({ state }: Props) {
                     }`}
                   >
                     {state.verdict === "exists"
-                      ? "VULNERABLE"
+                      ? t("badge.vulnerable")
                       : state.verdict === "not_exists"
-                        ? "SAFE"
+                        ? t("badge.safe")
                         : state.verdict?.toUpperCase()}
                   </span>
                 )}
               </div>
               {state.verdictMessage && (
                 <p className="text-[11px] text-zinc-500 leading-relaxed mt-0.5">
-                  {state.verdictMessage}
+                  {translatePipelineMessage(language, state.verdictMessage)}
                 </p>
               )}
             </div>
@@ -167,7 +175,7 @@ export default function FlowPanel({ state }: Props) {
         {state.findings.length > 0 && (
           <div className="mt-8 pt-6 border-t border-white/[0.06]">
             <h3 className="text-[10px] font-semibold text-zinc-500 uppercase tracking-widest mb-3">
-              Findings ({state.findings.length})
+              {t("flow.findings")} ({state.findings.length})
             </h3>
             <div className="space-y-2">
               {state.findings.map((f, i) => (
@@ -188,7 +196,7 @@ export default function FlowPanel({ state }: Props) {
                             : "bg-blue-500/15 text-blue-400"
                       }`}
                     >
-                      {f.risk}
+                      {translateRisk(language, f.risk)}
                     </span>
                   </div>
                   {f.contract && (
@@ -371,40 +379,52 @@ function VerdictNode({
   );
 }
 
-function StatusBadge({ status }: { status: PhaseState["status"] }) {
+function translateRisk(language: Language, risk: string) {
+  if (language === "en") return risk;
+  const zhRisk: Record<string, string> = {
+    Critical: "严重",
+    High: "高危",
+    Medium: "中危",
+    Low: "低危",
+    Informational: "提示",
+  };
+  return zhRisk[risk] || risk;
+}
+
+function StatusBadge({
+  language,
+  status,
+}: {
+  language: Language;
+  status: PhaseState["status"];
+}) {
   const config: Record<
     string,
-    { label: string; className: string }
+    { className: string }
   > = {
     pending: {
-      label: "PENDING",
       className: "bg-white/5 text-zinc-500",
     },
     running: {
-      label: "RUNNING",
       className: "bg-indigo-500/15 text-indigo-400",
     },
     completed: {
-      label: "DONE",
       className: "bg-emerald-500/15 text-emerald-400",
     },
     skipped: {
-      label: "SKIPPED",
       className: "bg-zinc-500/10 text-zinc-500",
     },
     retrying: {
-      label: "RETRYING",
       className: "bg-amber-500/15 text-amber-400",
     },
     error: {
-      label: "ERROR",
       className: "bg-red-500/15 text-red-400",
     },
   };
   const c = config[status] || config.pending;
   return (
     <span className={`text-[9px] font-bold px-2 py-0.5 rounded ${c.className}`}>
-      {c.label}
+      {getStatusLabel(language, status)}
     </span>
   );
 }

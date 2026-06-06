@@ -13,6 +13,10 @@ PROJECTS_ROOT = RUNTIME_ROOT / "projects"
 UPLOADS_ROOT = RUNTIME_ROOT / "uploads"
 IGNORED_PARTS = {".git", "node_modules", "out", "cache", "test", "preprocessed"}
 IGNORED_FILES = {"generation_repair_log.json", "forge_run_output.txt", "audit_report.pdf"}
+REPLAY_CASE_BY_SOURCE = {
+    "BNRG.sol": "binamon-dos",
+    "DoctorShiba.sol": "cleverminu-approve-race",
+}
 
 
 def _safe_project_name(name: str) -> str:
@@ -39,6 +43,14 @@ def list_project_files(root: Path) -> list[str]:
     )
 
 
+def _detect_replay_case(files: list[str]) -> str | None:
+    filenames = {Path(file).name for file in files}
+    for source_name, case_id in REPLAY_CASE_BY_SOURCE.items():
+        if source_name in filenames:
+            return case_id
+    return None
+
+
 def create_from_example(case_id: str) -> ProjectSummary:
     ensure_runtime()
     src = (EXAMPLE_ROOT / case_id).resolve()
@@ -52,12 +64,14 @@ def create_from_example(case_id: str) -> ProjectSummary:
         shutil.copytree(src / "src", dst / "src")
     if (src / "audit_report.md").exists():
         shutil.copy2(src / "audit_report.md", dst / "audit_report.md")
+    files = list_project_files(dst)
     return ProjectSummary(
         project_id=project_id,
         name=case_id,
         status="ready",
         root=str(dst),
-        files=list_project_files(dst),
+        files=files,
+        replay_case=case_id,
     )
 
 
@@ -87,12 +101,14 @@ def create_from_zip(filename: str, content: bytes) -> ProjectSummary:
     else:
         root = dst
 
+    files = list_project_files(root)
     return ProjectSummary(
         project_id=project_id,
         name=Path(filename).stem,
         status="ready",
         root=str(root),
-        files=list_project_files(root),
+        files=files,
+        replay_case=_detect_replay_case(files),
     )
 
 

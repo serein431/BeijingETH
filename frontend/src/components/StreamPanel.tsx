@@ -1,14 +1,22 @@
 import { useEffect, useRef } from "react";
 import Markdown from "react-markdown";
-import type { AuditState } from "../types";
+import { createTranslator, getPhaseLabel, translateStreamText } from "../i18n";
+import type { AuditState, Language } from "../types";
 
 interface Props {
+  language: Language;
   state: AuditState;
   onStop: () => void;
   onReset: () => void;
 }
 
-export default function StreamPanel({ state, onStop, onReset }: Props) {
+export default function StreamPanel({
+  language,
+  state,
+  onStop,
+  onReset,
+}: Props) {
+  const t = createTranslator(language);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -23,7 +31,7 @@ export default function StreamPanel({ state, onStop, onReset }: Props) {
       <header className="h-14 flex items-center justify-between px-6 border-b border-white/[0.06] shrink-0">
         <div className="flex items-center gap-3">
           <h2 className="text-sm font-semibold text-white tracking-wide">
-            Audit Analysis
+            {t("stream.title")}
           </h2>
           {state.isRunning && (
             <span className="flex items-center gap-2 text-xs text-zinc-400">
@@ -48,14 +56,18 @@ export default function StreamPanel({ state, onStop, onReset }: Props) {
               </svg>
               <span className="bg-gradient-to-r from-zinc-300 to-zinc-500 bg-clip-text text-transparent animate-pulse">
                 {state.currentPhase
-                  ? state.phases.find((p) => p.name === state.currentPhase)
-                      ?.label || state.currentPhase
-                  : "Processing..."}
+                  ? getPhaseLabel(
+                      language,
+                      state.currentPhase,
+                      state.phases.find((p) => p.name === state.currentPhase)
+                        ?.label || state.currentPhase
+                    )
+                  : t("stream.processing")}
               </span>
             </span>
           )}
           {state.verdict && !state.isRunning && (
-            <VerdictBadge verdict={state.verdict} />
+            <VerdictBadge language={language} verdict={state.verdict} />
           )}
         </div>
         <div className="flex items-center gap-2">
@@ -64,7 +76,7 @@ export default function StreamPanel({ state, onStop, onReset }: Props) {
               onClick={onStop}
               className="text-xs text-zinc-400 hover:text-red-400 px-3 py-1.5 rounded-lg border border-white/[0.06] hover:border-red-500/30 transition-all"
             >
-              Stop
+              {t("stream.stop")}
             </button>
           )}
           {!state.isRunning && state.streamText && (
@@ -72,7 +84,7 @@ export default function StreamPanel({ state, onStop, onReset }: Props) {
               onClick={onReset}
               className="text-xs text-zinc-400 hover:text-white px-3 py-1.5 rounded-lg border border-white/[0.06] hover:border-white/20 transition-all"
             >
-              New Audit
+              {t("stream.newAudit")}
             </button>
           )}
         </div>
@@ -87,7 +99,7 @@ export default function StreamPanel({ state, onStop, onReset }: Props) {
                   key={i}
                   className="glass-panel rounded-lg p-3 flex items-start gap-3"
                 >
-                  <RiskBadge risk={f.risk} />
+                  <RiskBadge language={language} risk={f.risk} />
                   <div className="min-w-0">
                     <p className="text-sm font-medium text-zinc-100">
                       {f.title}
@@ -108,7 +120,7 @@ export default function StreamPanel({ state, onStop, onReset }: Props) {
           )}
 
           <div className="stream-text text-sm text-zinc-300 font-light leading-relaxed">
-            <Markdown>{state.streamText}</Markdown>
+            <Markdown>{translateStreamText(language, state.streamText)}</Markdown>
             {state.isRunning && (
               <span className="inline-block w-1.5 h-4 bg-white cursor-blink ml-0.5 align-middle shadow-[0_0_8px_rgba(255,255,255,0.6)]" />
             )}
@@ -116,7 +128,7 @@ export default function StreamPanel({ state, onStop, onReset }: Props) {
 
           {!state.isRunning && !state.streamText && (
             <div className="text-center text-zinc-600 py-20">
-              <p className="text-sm">Waiting for audit to start...</p>
+              <p className="text-sm">{t("stream.waiting")}</p>
             </div>
           )}
         </div>
@@ -125,7 +137,7 @@ export default function StreamPanel({ state, onStop, onReset }: Props) {
   );
 }
 
-function RiskBadge({ risk }: { risk: string }) {
+function RiskBadge({ language, risk }: { language: Language; risk: string }) {
   const colors: Record<string, string> = {
     High: "bg-red-500/15 text-red-400 border-red-500/20",
     Critical: "bg-red-500/15 text-red-400 border-red-500/20",
@@ -135,16 +147,30 @@ function RiskBadge({ risk }: { risk: string }) {
   };
   const cls =
     colors[risk] || "bg-zinc-500/15 text-zinc-400 border-zinc-500/20";
+  const zhRisk: Record<string, string> = {
+    Critical: "严重",
+    High: "高危",
+    Medium: "中危",
+    Low: "低危",
+    Informational: "提示",
+  };
   return (
     <span
       className={`text-[10px] font-bold px-2 py-0.5 rounded border shrink-0 ${cls}`}
     >
-      {risk.toUpperCase()}
+      {language === "zh" ? zhRisk[risk] || risk : risk.toUpperCase()}
     </span>
   );
 }
 
-function VerdictBadge({ verdict }: { verdict: string }) {
+function VerdictBadge({
+  language,
+  verdict,
+}: {
+  language: Language;
+  verdict: string;
+}) {
+  const t = createTranslator(language);
   const isVulnerable = verdict === "exists";
   const isFailed = verdict === "failed";
   return (
@@ -158,10 +184,10 @@ function VerdictBadge({ verdict }: { verdict: string }) {
       }`}
     >
       {isVulnerable
-        ? "VULNERABILITY EXISTS"
+        ? t("stream.verdictExists")
         : isFailed
-          ? "VERIFICATION FAILED"
-          : "NOT VULNERABLE"}
+          ? t("stream.verificationFailed")
+          : t("stream.notVulnerable")}
     </span>
   );
 }

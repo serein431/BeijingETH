@@ -1,6 +1,7 @@
 import { useCallback, useRef, useState } from "react";
 import {
   type AuditState,
+  type AuditMode,
   PIPELINE_PHASES,
   type PhaseState,
   type Vulnerability,
@@ -178,8 +179,8 @@ export function useAuditStream() {
   );
 
   const startExampleReplay = useCallback(
-    (caseId: string) => {
-      startStream(`/api/examples/${caseId}/stream`);
+    (caseId: string, mode: AuditMode = "full_audit") => {
+      startStream(`/api/examples/${caseId}/stream?mode=${mode}`);
     },
     [startStream]
   );

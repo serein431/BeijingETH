@@ -1,4 +1,14 @@
-export default function Sidebar() {
+import { createTranslator } from "../i18n";
+import type { Language } from "../types";
+
+interface Props {
+  language: Language;
+  onToggleLanguage: () => void;
+}
+
+export default function Sidebar({ language, onToggleLanguage }: Props) {
+  const t = createTranslator(language);
+
   return (
     <aside className="w-[72px] shrink-0 border-r border-white/[0.08] bg-[#030303]/40 backdrop-blur-xl flex flex-col items-center py-6 z-20">
       <button className="w-10 h-10 rounded-xl bg-white flex items-center justify-center mb-10 shadow-[0_0_20px_rgba(255,255,255,0.4)] hover:scale-105 transition-transform">
@@ -26,7 +36,7 @@ export default function Sidebar() {
 
         <div className="w-8 h-px bg-white/[0.08] my-1" />
 
-        <SidebarButton title="Projects">
+        <SidebarButton title={t("nav.projects")}>
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -35,7 +45,7 @@ export default function Sidebar() {
           />
         </SidebarButton>
 
-        <SidebarButton title="History">
+        <SidebarButton title={t("nav.history")}>
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -44,7 +54,7 @@ export default function Sidebar() {
           />
         </SidebarButton>
 
-        <SidebarButton title="Settings">
+        <SidebarButton title={t("nav.settings")}>
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -59,6 +69,15 @@ export default function Sidebar() {
           />
         </SidebarButton>
       </nav>
+
+      <button
+        onClick={onToggleLanguage}
+        title={t("language.label")}
+        aria-label={t("language.label")}
+        className="mt-4 w-11 h-8 rounded-full border border-white/[0.08] bg-white/[0.04] text-[11px] font-bold text-zinc-300 hover:text-white hover:bg-white/[0.08] hover:border-white/[0.16] transition-all flex items-center justify-center"
+      >
+        {language === "en" ? t("language.chinese") : t("language.english")}
+      </button>
     </aside>
   );
 }

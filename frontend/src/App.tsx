@@ -4,26 +4,26 @@ import Sidebar from "./components/Sidebar";
 import StreamPanel from "./components/StreamPanel";
 import UploadArea from "./components/UploadArea";
 import { useAuditStream } from "./hooks/useAuditStream";
+import type { AuditMode, Language } from "./types";
+
+const DEFAULT_REPLAY_CASE = "binamon-dos";
 
 export default function App() {
-  const { state, startProjectAudit, startExampleReplay, stop, reset } =
-    useAuditStream();
+  const { state, startExampleReplay, stop, reset } = useAuditStream();
   const [started, setStarted] = useState(false);
+  const [language, setLanguage] = useState<Language>("en");
+  const [auditMode, setAuditMode] = useState<AuditMode>("full_audit");
+
+  const handleToggleLanguage = useCallback(() => {
+    setLanguage((current) => (current === "en" ? "zh" : "en"));
+  }, []);
 
   const handleProjectCreated = useCallback(
-    (projectId: string) => {
+    (replayCase: string | null) => {
       setStarted(true);
-      startProjectAudit(projectId);
+      startExampleReplay(replayCase || DEFAULT_REPLAY_CASE, auditMode);
     },
-    [startProjectAudit]
-  );
-
-  const handleExampleSelected = useCallback(
-    (caseId: string) => {
-      setStarted(true);
-      startExampleReplay(caseId);
-    },
-    [startExampleReplay]
+    [auditMode, startExampleReplay]
   );
 
   const handleReset = useCallback(() => {
@@ -37,18 +37,25 @@ export default function App() {
       <div className="fixed bottom-[-20%] right-[10%] w-[40%] h-[50%] bg-emerald-900/10 rounded-full blur-[140px] pointer-events-none mix-blend-screen z-0" />
       <div className="fixed top-[20%] right-[-10%] w-[30%] h-[40%] bg-purple-900/10 rounded-full blur-[140px] pointer-events-none mix-blend-screen z-0" />
 
-      <Sidebar />
+      <Sidebar language={language} onToggleLanguage={handleToggleLanguage} />
 
       <main className="flex-1 flex relative z-10 min-w-0">
         {!started ? (
           <UploadArea
+            auditMode={auditMode}
+            language={language}
+            onAuditModeChange={setAuditMode}
             onProjectCreated={handleProjectCreated}
-            onExampleSelected={handleExampleSelected}
           />
         ) : (
           <>
-            <StreamPanel state={state} onStop={stop} onReset={handleReset} />
-            <FlowPanel state={state} />
+            <StreamPanel
+              language={language}
+              state={state}
+              onStop={stop}
+              onReset={handleReset}
+            />
+            <FlowPanel language={language} state={state} />
           </>
         )}
       </main>

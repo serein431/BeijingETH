@@ -6,6 +6,9 @@ export type PhaseStatus =
   | "retrying"
   | "error";
 
+export type Language = "en" | "zh";
+export type AuditMode = "full_audit" | "verify_finding";
+
 export interface PhaseState {
   name: string;
   label: string;
@@ -48,4 +51,13 @@ export interface ExampleCase {
   title: string;
   description: string;
   final_verdict: string | null;
+}
+
+export interface ProjectSummary {
+  project_id: string;
+  name: string;
+  status: string;
+  root: string;
+  files: string[];
+  replay_case: string | null;
 }
