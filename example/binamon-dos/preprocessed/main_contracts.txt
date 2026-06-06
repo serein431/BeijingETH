@@ -1,0 +1,20 @@
+contract Ownable {
+    constructor () {
+        _owner = msg.sender;
+    }
+}
+
+
+-----
+
+contract BNRG is IERC20, Ownable {
+    constructor () {
+        _owner = msg.sender;
+    }
+    constructor() { 
+        state = State.Locked;
+        balances[msg.sender] = _totalSupply;
+        emit Transfer(address(0), msg.sender, _totalSupply);
+    }
+}
+

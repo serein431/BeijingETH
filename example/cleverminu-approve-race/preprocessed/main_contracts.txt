@@ -1,0 +1,57 @@
+abstract contract Context {
+}
+
+
+-----
+
+contract Ownable is Context {
+constructor () internal {
+
+address msgSender = _msgSender();
+
+_owner = msgSender;
+
+emit OwnershipTransferred(address(0), msgSender);
+
+}
+}
+
+
+-----
+
+contract Pausable is Ownable {
+constructor () internal {
+
+address msgSender = _msgSender();
+
+_owner = msgSender;
+
+emit OwnershipTransferred(address(0), msgSender);
+
+}
+}
+
+
+-----
+
+contract DoctorShiba is Context, IERC20, Ownable, Pausable {
+constructor () internal {
+
+address msgSender = _msgSender();
+
+_owner = msgSender;
+
+emit OwnershipTransferred(address(0), msgSender);
+
+}
+constructor() public {
+
+_balances[_msgSender()] = _totalSupply;
+
+
+
+emit Transfer(address(0), _msgSender(), _totalSupply);
+
+}
+}
+
