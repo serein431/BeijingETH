@@ -93,7 +93,7 @@ def detect(project_id: str, request: DetectRequest):
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     if request.tool == "slither":
         return run_slither(project_id, root)
-    return run_llm_audit(project_id, root)
+    return run_llm_audit(project_id, root, request.llm)
 
 
 @app.post("/api/projects/{project_id}/verify", response_model=JobCreated)
