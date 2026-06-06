@@ -1,5 +1,6 @@
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import ChatDrawer from "./components/ChatDrawer";
 import FlowPanel from "./components/FlowPanel";
 import LandingPage from "./components/LandingPage";
 import Sidebar from "./components/Sidebar";
@@ -17,6 +18,7 @@ function MainApp() {
   const [started, setStarted] = useState(false);
   const [language, setLanguage] = useState<Language>("en");
   const [auditMode, setAuditMode] = useState<AuditMode>("discover_only");
+  const [activeProject, setActiveProject] = useState<string>(DEFAULT_REPLAY_CASE);
 
   const handleToggleLanguage = useCallback(() => {
     setLanguage((current) => (current === "en" ? "zh" : "en"));
@@ -24,8 +26,10 @@ function MainApp() {
 
   const handleProjectCreated = useCallback(
     (replayCase: string | null) => {
+      const caseId = replayCase || DEFAULT_REPLAY_CASE;
+      setActiveProject(caseId);
       setStarted(true);
-      startExampleReplay(replayCase || DEFAULT_REPLAY_CASE, auditMode);
+      startExampleReplay(caseId, auditMode);
     },
     [auditMode, startExampleReplay]
   );
@@ -34,6 +38,17 @@ function MainApp() {
     reset();
     setStarted(false);
   }, [reset]);
+
+  const chatContext = useMemo(
+    () => ({
+      findings: state.findings,
+      phases: state.phases,
+      streamText: state.streamText,
+      projectName: activeProject,
+    }),
+    [state.findings, state.phases, state.streamText, activeProject]
+  );
+  const isAuditComplete = !state.isRunning && state.verdict !== null;
 
   if (!enteredApp) {
     return (
@@ -77,6 +92,13 @@ function MainApp() {
           </>
         )}
       </main>
+
+      {started && (
+        <ChatDrawer
+          context={chatContext}
+          isAuditComplete={isAuditComplete}
+        />
+      )}
     </div>
   );
 }

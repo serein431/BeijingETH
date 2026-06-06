@@ -1,8 +1,13 @@
 from __future__ import annotations
 
+import json
+import os
+from typing import List, Optional
+
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
+from pydantic import BaseModel
 
 from .config import default_llm_config
 from .detectors import run_llm_audit, run_slither
@@ -171,4 +176,108 @@ def example_stream(case_id: str, mode: str = "discover_only"):
         replay_as_stream(case_id, mode),
         media_type="text/event-stream",
         headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )
+
+
+class ChatMessage(BaseModel):
+    role: str  # "user" | "assistant" | "system"
+    content: str
+
+
+class AuditContext(BaseModel):
+    findings: Optional[List[dict]] = None
+    phases: Optional[List[dict]] = None
+    streamText: Optional[str] = None  # last 2000 chars of audit log
+    projectName: Optional[str] = None
+
+
+class ChatRequest(BaseModel):
+    messages: List[ChatMessage]
+    context: Optional[AuditContext] = None
+
+
+def build_system_prompt(context: Optional[AuditContext]) -> str:
+    base = (
+        "You are an AI smart contract security auditor assistant. "
+        "The user has just completed an audit of a Solidity contract. "
+        "Help the user understand vulnerabilities, suggest remediations, explain attack paths, "
+        "and provide security best practices. Respond in the same language the user uses.\n"
+        "Be concise but thorough. Use code blocks for Solidity examples."
+    )
+
+    if not context:
+        return base
+
+    parts: List[str] = [base, "\n\n## Audit Context\n"]
+
+    if context.projectName:
+        parts.append(f"- Project: {context.projectName}\n")
+
+    if context.findings:
+        parts.append(f"- Vulnerabilities Found: {len(context.findings)}\n")
+        parts.append("### Findings:\n")
+        for f in context.findings[:10]:
+            risk = f.get("risk", "?")
+            title = f.get("title", "Unknown")
+            description = (f.get("description", "") or "")[:200]
+            parts.append(f"- [{risk}] {title}: {description}\n")
+
+    if context.phases:
+        phases_summary = ", ".join(
+            [f"{p.get('label', '?')}({p.get('status', '?')})" for p in context.phases]
+        )
+        parts.append(f"\n### Pipeline Status: {phases_summary}\n")
+
+    if context.streamText:
+        text = context.streamText[-2000:]
+        parts.append(f"\n### Audit Log (last portion):\n```\n{text}\n```\n")
+
+    return "".join(parts)
+
+
+@app.post("/api/chat")
+async def chat(request: ChatRequest):
+    try:
+        from openai import OpenAI
+    except ImportError as exc:
+        raise HTTPException(status_code=500, detail="openai package is not installed") from exc
+
+    api_key = os.getenv("OPENAI_API_KEY")
+    base_url = os.getenv("OPENAI_BASE_URL")
+    model = os.getenv("OPENAI_MODEL", "claude_sonnet4_5")
+
+    if not api_key:
+        raise HTTPException(status_code=500, detail="OPENAI_API_KEY is not configured")
+
+    client = OpenAI(api_key=api_key, base_url=base_url) if base_url else OpenAI(api_key=api_key)
+
+    system_prompt = build_system_prompt(request.context)
+    messages: List[dict] = [{"role": "system", "content": system_prompt}]
+    messages.extend([{"role": m.role, "content": m.content} for m in request.messages])
+
+    def event_stream():
+        try:
+            response = client.chat.completions.create(
+                model=model,
+                messages=messages,
+                stream=True,
+                temperature=0.7,
+                max_tokens=2048,
+            )
+            for chunk in response:
+                if chunk.choices and chunk.choices[0].delta and chunk.choices[0].delta.content:
+                    token = chunk.choices[0].delta.content
+                    yield f"data: {json.dumps({'token': token})}\n\n"
+            yield "data: [DONE]\n\n"
+        except Exception as exc:  # noqa: BLE001
+            yield f"data: {json.dumps({'error': str(exc)})}\n\n"
+
+    return StreamingResponse(
+        event_stream(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
     )

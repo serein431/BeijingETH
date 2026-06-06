@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   createTranslator,
   getPhaseLabel,
@@ -5,10 +6,18 @@ import {
   translatePipelineMessage,
 } from "../i18n";
 import type { AuditState, Language, PhaseState } from "../types";
+import ToolsPopover from "./ToolsPopover";
 
 interface Props {
   language: Language;
   state: AuditState;
+}
+
+type ExpandablePhase = "parse" | "slither";
+const EXPANDABLE_PHASES: ExpandablePhase[] = ["parse", "slither"];
+
+function isExpandablePhase(name: string): name is ExpandablePhase {
+  return (EXPANDABLE_PHASES as string[]).includes(name);
 }
 
 const PHASE_ICONS: Record<string, React.ReactNode> = {
@@ -58,6 +67,19 @@ export default function FlowPanel({ language, state }: Props) {
   const t = createTranslator(language);
   const hasVerdict = state.verdict !== null;
 
+  const [popoverPhase, setPopoverPhase] = useState<ExpandablePhase | null>(null);
+  const [popoverPosition, setPopoverPosition] = useState({ x: 0, y: 0 });
+
+  const handlePhaseClick = (
+    phaseName: string,
+    event: React.MouseEvent<HTMLElement>,
+  ) => {
+    if (!isExpandablePhase(phaseName)) return;
+    const rect = event.currentTarget.getBoundingClientRect();
+    setPopoverPosition({ x: rect.right + 12, y: rect.top });
+    setPopoverPhase((prev) => (prev === phaseName ? null : phaseName));
+  };
+
   return (
     <aside className="w-[340px] shrink-0 border-l border-white/[0.06] bg-[#030303]/60 backdrop-blur-2xl flex flex-col z-20 relative">
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#030303]/80 pointer-events-none z-10" />
@@ -105,12 +127,32 @@ export default function FlowPanel({ language, state }: Props) {
                 </div>
               )}
 
-              <div className="flex items-start gap-4 pb-8 relative z-10">
-                <PhaseNode phase={phase} isActive={state.currentPhase === phase.name} />
+              <div
+                className={`flex items-start gap-4 pb-8 relative z-10 rounded-lg transition-all duration-200 ${
+                  isExpandablePhase(phase.name)
+                    ? `cursor-pointer -mx-2 px-2 hover:bg-white/[0.02] ${
+                        popoverPhase === phase.name
+                          ? "bg-indigo-500/[0.04] ring-1 ring-indigo-400/30"
+                          : "hover:ring-1 hover:ring-indigo-500/20"
+                      }`
+                    : ""
+                }`}
+                onClick={
+                  isExpandablePhase(phase.name)
+                    ? (e) => handlePhaseClick(phase.name, e)
+                    : undefined
+                }
+              >
+                <PhaseNode
+                  phase={phase}
+                  isActive={state.currentPhase === phase.name}
+                  expandable={isExpandablePhase(phase.name)}
+                  expanded={popoverPhase === phase.name}
+                />
                 <div className="flex-1 min-w-0 pt-2">
                   <div className="flex items-center justify-between mb-1">
                     <span
-                      className={`text-sm font-medium ${
+                      className={`text-sm font-medium flex items-center gap-1.5 ${
                         phase.status === "running"
                           ? "text-white"
                           : phase.status === "completed"
@@ -121,6 +163,25 @@ export default function FlowPanel({ language, state }: Props) {
                       }`}
                     >
                       {getPhaseLabel(language, phase.name, phase.label)}
+                      {isExpandablePhase(phase.name) && (
+                        <svg
+                          className={`w-3 h-3 text-zinc-600 transition-all ${
+                            popoverPhase === phase.name
+                              ? "text-indigo-400 translate-x-0.5"
+                              : "group-hover:text-indigo-300"
+                          }`}
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 5l7 7-7 7"
+                          />
+                        </svg>
+                      )}
                     </span>
                     <StatusBadge language={language} status={phase.status} />
                   </div>
@@ -214,6 +275,13 @@ export default function FlowPanel({ language, state }: Props) {
           </div>
         )}
       </div>
+      {popoverPhase && (
+        <ToolsPopover
+          phase={popoverPhase}
+          position={popoverPosition}
+          onClose={() => setPopoverPhase(null)}
+        />
+      )}
     </aside>
   );
 }
@@ -221,15 +289,19 @@ export default function FlowPanel({ language, state }: Props) {
 function PhaseNode({
   phase,
   isActive,
+  expandable = false,
+  expanded = false,
 }: {
   phase: PhaseState;
   isActive: boolean;
+  expandable?: boolean;
+  expanded?: boolean;
 }) {
   const icon = PHASE_ICONS[phase.name];
 
   return (
     <div
-      className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border transition-all duration-500 ${
+      className={`relative w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border transition-all duration-500 ${
         phase.status === "running"
           ? "bg-indigo-500/20 border-indigo-500/40 node-active"
           : phase.status === "completed"
@@ -239,6 +311,8 @@ function PhaseNode({
               : phase.status === "error"
                 ? "bg-red-500/15 border-red-500/30"
                 : "bg-white/[0.03] border-white/[0.06]"
+      } ${expandable ? "hover:scale-105" : ""} ${
+        expanded ? "ring-2 ring-indigo-400/40 ring-offset-2 ring-offset-[#030303]" : ""
       }`}
     >
       {phase.status === "running" ? (
@@ -312,6 +386,24 @@ function PhaseNode({
         >
           {icon}
         </svg>
+      )}
+      {expandable && (
+        <span
+          className={`absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full border border-[#030303] transition-all ${
+            expanded
+              ? "bg-indigo-400 shadow-[0_0_8px_rgba(129,140,248,0.8)]"
+              : "bg-indigo-500/60"
+          }`}
+          aria-hidden
+        >
+          <span className="absolute inset-[3px] rounded-full bg-[#030303] flex items-center justify-center">
+            <span
+              className={`block w-[3px] h-[3px] rounded-full ${
+                expanded ? "bg-white" : "bg-indigo-300"
+              }`}
+            />
+          </span>
+        </span>
       )}
     </div>
   );
