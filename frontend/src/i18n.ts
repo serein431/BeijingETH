@@ -2,6 +2,7 @@ import type { Language, PhaseStatus } from "./types";
 
 export type TranslationKey =
   | "nav.projects"
+  | "nav.analysis"
   | "nav.history"
   | "nav.settings"
   | "language.label"
@@ -17,9 +18,14 @@ export type TranslationKey =
   | "upload.cardLabel"
   | "upload.cardSub"
   | "upload.live"
-  | "mode.full.title"
-  | "mode.full.kicker"
-  | "mode.full.text"
+  | "home.enter"
+  | "home.viewAnalysis"
+  | "analysis.open"
+  | "analysis.kicker"
+  | "analysis.description"
+  | "mode.discovery.title"
+  | "mode.discovery.kicker"
+  | "mode.discovery.text"
   | "mode.verify.title"
   | "mode.verify.kicker"
   | "mode.verify.text"
@@ -37,6 +43,8 @@ export type TranslationKey =
   | "home.workflow.parseText"
   | "home.workflow.detectTitle"
   | "home.workflow.detectText"
+  | "home.workflow.reportTitle"
+  | "home.workflow.reportText"
   | "home.workflow.verifyTitle"
   | "home.workflow.verifyText"
   | "home.verifyWorkflow.projectTitle"
@@ -48,6 +56,7 @@ export type TranslationKey =
   | "home.value.scan"
   | "home.value.llm"
   | "home.value.foundry"
+  | "home.value.report"
   | "badge.vulnerable"
   | "badge.safe"
   | "stream.title"
@@ -58,6 +67,7 @@ export type TranslationKey =
   | "stream.verdictExists"
   | "stream.verificationFailed"
   | "stream.notVulnerable"
+  | "stream.discoveryComplete"
   | "flow.pipeline"
   | "flow.verdict"
   | "flow.findings";
@@ -65,53 +75,62 @@ export type TranslationKey =
 const translations: Record<Language, Record<TranslationKey, string>> = {
   en: {
     "nav.projects": "Projects",
+    "nav.analysis": "Structure",
     "nav.history": "History",
     "nav.settings": "Settings",
     "language.label": "Language",
     "language.english": "EN",
     "language.chinese": "中",
-    "upload.eyebrow": "AI Solidity Audit Demo",
-    "upload.title": "Smart Contract Audit",
+    "upload.eyebrow": "AI Agent x Blockchain Security",
+    "upload.title": "AI Agent Smart Contract Automated Audit and Verification",
     "upload.subtitle":
-      "Turn a suspicious Solidity finding into executable proof. Upload a project and watch the audit close the loop from structure to verdict.",
+      "Combine AI Agent workflows with blockchain security analysis to automate vulnerability discovery and verification. Built for developers and auditors, it connects modular audit tools and turns natural-language vulnerability descriptions into executable PoCs for real execution validation.",
     "upload.uploading": "Uploading...",
     "upload.drop": "Drop a .zip Solidity project here",
     "upload.browse": "or click to browse files",
-    "upload.hint": "Upload a ZIP package to start the live audit replay",
-    "upload.cardLabel": "ZIP Intake",
-    "upload.cardSub": "Foundry-ready Solidity project",
+    "upload.hint": "Upload a ZIP package to start project analysis",
+    "upload.cardLabel": "Upload Project",
+    "upload.cardSub": "Supports runnable Solidity / Foundry projects (ZIP)",
     "upload.live": "Live",
-    "mode.full.title": "Discover & Verify",
-    "mode.full.kicker": "Start from source code",
-    "mode.full.text": "Run the full demo loop: structure parsing, vulnerability discovery, PoC generation, Forge logs, and verdict.",
-    "mode.verify.title": "Verify Existing Report",
-    "mode.verify.kicker": "Start from an audit finding",
-    "mode.verify.text": "Paste a finding from another report, upload the project, then jump straight into PoC validation.",
+    "home.enter": "Start Audit",
+    "home.viewAnalysis": "Open Structure",
+    "analysis.open": "View project functions and call graph",
+    "analysis.kicker": "Code intelligence",
+    "analysis.description": "Inspect parsed contracts, function source, and the generated control-flow graph for the uploaded project.",
+    "mode.discovery.title": "Automatic Vulnerability Discovery",
+    "mode.discovery.kicker": "Start from source code",
+    "mode.discovery.text": "For complete Solidity / Foundry projects, automatically parse code structure, call modular vulnerability discovery tools, and output an audit report.",
+    "mode.verify.title": "Verify Existing Vulnerability Conclusions",
+    "mode.verify.kicker": "Start from a report",
+    "mode.verify.text": "Input a natural-language vulnerability description. The AI Agent generates an executable PoC and runs it in Foundry to solve the hard-to-verify report problem.",
     "report.label": "Finding to verify",
     "report.placeholder": "Paste the vulnerability description or audit report excerpt here...",
-    "report.helper": "Demo mode uses this as reviewer context and replays the verification stage.",
+    "report.helper": "This finding is used as reviewer context before the verification stage starts.",
     "home.metric.modeLabel": "Mode",
-    "home.metric.modeValue": "Replay demo",
-    "home.metric.stackLabel": "Stack",
-    "home.metric.stackValue": "Slither + LLM + Foundry",
+    "home.metric.modeValue": "Smart audit workspace",
+    "home.metric.stackLabel": "Capability",
+    "home.metric.stackValue": "Discovery + Verification dual Agent",
     "home.metric.outputLabel": "Output",
-    "home.metric.outputValue": "Evidence pack",
-    "home.workflow.title": "Audit loop",
-    "home.workflow.parseTitle": "1. Understand",
-    "home.workflow.parseText": "Parse contracts, functions, and source snippets so the reviewer sees the project shape first.",
-    "home.workflow.detectTitle": "2. Discover",
-    "home.workflow.detectText": "Surface suspicious issues with static tooling and semantic LLM review.",
-    "home.workflow.verifyTitle": "3. Verify",
-    "home.workflow.verifyText": "Generate a Foundry PoC, replay compile/test logs, and produce a final vulnerability verdict.",
+    "home.metric.outputValue": "Audit report + PoC + verdict",
+    "home.workflow.title": "Automated Loop from Discovery to Verification",
+    "home.workflow.parseTitle": "1. Understand Project",
+    "home.workflow.parseText": "Automatically parse project structure and key functions so developers and auditors can quickly understand the code.",
+    "home.workflow.detectTitle": "2. Discover Vulnerabilities",
+    "home.workflow.detectText": "Modularly connect static analysis tools and LLM Agents to discover potential vulnerabilities and generate structured security conclusions.",
+    "home.workflow.reportTitle": "3. Report",
+    "home.workflow.reportText": "Show risk level, description, and related contract/function without starting PoC verification.",
+    "home.workflow.verifyTitle": "3. Verify Vulnerabilities",
+    "home.workflow.verifyText": "Turn natural-language vulnerability descriptions into Foundry PoCs, execute compile and test validation, then output executable evidence and exploit conclusions.",
     "home.verifyWorkflow.projectTitle": "1. Upload project",
     "home.verifyWorkflow.projectText": "Provide the Solidity codebase so the Agent can import contracts and build a runnable test.",
     "home.verifyWorkflow.reportTitle": "2. Paste finding",
     "home.verifyWorkflow.reportText": "Bring a vulnerability description from another audit report or your own review.",
     "home.verifyWorkflow.proofTitle": "3. Prove it",
     "home.verifyWorkflow.proofText": "Turn the report text into a Foundry PoC and replay compile/test evidence.",
-    "home.value.scan": "Fast suspicious finding discovery",
-    "home.value.llm": "Natural-language exploit reasoning",
-    "home.value.foundry": "Executable proof instead of a static report",
+    "home.value.scan": "Open-source framework with flexible audit-tool adapters",
+    "home.value.llm": "AI Agent driven vulnerability discovery and verification",
+    "home.value.foundry": "Natural-language descriptions generate executable PoCs",
+    "home.value.report": "Clean report output for manual review",
     "badge.vulnerable": "VULNERABLE",
     "badge.safe": "SAFE",
     "stream.title": "Audit Analysis",
@@ -122,59 +141,69 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     "stream.verdictExists": "VULNERABILITY EXISTS",
     "stream.verificationFailed": "VERIFICATION FAILED",
     "stream.notVulnerable": "NOT VULNERABLE",
+    "stream.discoveryComplete": "DISCOVERY COMPLETE",
     "flow.pipeline": "Pipeline",
     "flow.verdict": "Verdict",
     "flow.findings": "Findings",
   },
   zh: {
     "nav.projects": "项目",
+    "nav.analysis": "结构分析",
     "nav.history": "历史",
     "nav.settings": "设置",
     "language.label": "语言",
     "language.english": "EN",
     "language.chinese": "中",
-    "upload.eyebrow": "AI Solidity 审计演示",
-    "upload.title": "智能合约审计",
+    "upload.eyebrow": "AI Agent × Blockchain Security",
+    "upload.title": "AI Agent 智能合约自动审计与验证",
     "upload.subtitle":
-      "把可疑漏洞变成可执行证据。上传项目后，实时观看从代码结构到最终结论的审计闭环。",
+      "结合 AI Agent 与区块链安全分析，支持漏洞发现与漏洞验证双流程自动化。面向开发者与审计人员，模块化接入审计工具，并将自然语言漏洞描述自动转化为可执行 PoC，在真实链上环境验证",
     "upload.uploading": "上传中...",
     "upload.drop": "将 .zip Solidity 项目拖到这里",
     "upload.browse": "或点击选择文件",
-    "upload.hint": "上传 ZIP 包后开始实时审计回放",
-    "upload.cardLabel": "ZIP 入口",
-    "upload.cardSub": "可运行的 Solidity / Foundry 项目",
+    "upload.hint": "上传 ZIP 包后开始项目分析",
+    "upload.cardLabel": "上传项目",
+    "upload.cardSub": "支持可运行的 Solidity / Foundry 项目（ZIP）",
     "upload.live": "实时",
-    "mode.full.title": "发现并验证",
-    "mode.full.kicker": "从源码开始",
-    "mode.full.text": "演示完整闭环：结构解析、漏洞发现、PoC 生成、Forge 日志和最终结论。",
-    "mode.verify.title": "验证已有报告",
-    "mode.verify.kicker": "从审计发现开始",
-    "mode.verify.text": "粘贴外部报告里的漏洞描述，上传项目后直接进入 PoC 验证阶段。",
+    "home.enter": "开始审计",
+    "home.viewAnalysis": "打开结构",
+    "analysis.open": "查看项目函数与调用图",
+    "analysis.kicker": "代码理解",
+    "analysis.description": "查看上传项目解析出的合约列表、函数源码和控制流图，承接“理解项目”这一步。",
+    "mode.discovery.title": "自动发现漏洞",
+    "mode.discovery.kicker": "从源码开始",
+    "mode.discovery.text": "面向完整 Solidity / Foundry 项目，自动解析代码结构，模块化调用漏洞挖掘工具，输出审计报告；",
+    "mode.verify.title": "验证已有漏洞结论",
+    "mode.verify.kicker": "从报告开始",
+    "mode.verify.text": "输入自然语言漏洞描述，AI Agent 自动生成可执行 PoC，并在 Foundry 环境中运行验证，解决“有结论、难验证”的核心痛点。",
     "report.label": "待验证漏洞",
     "report.placeholder": "在这里粘贴漏洞描述或审计报告片段...",
-    "report.helper": "演示模式会把它作为审计上下文，并回放验证阶段。",
+    "report.helper": "系统会把它作为审计上下文，并进入验证阶段。",
     "home.metric.modeLabel": "模式",
-    "home.metric.modeValue": "演示回放",
-    "home.metric.stackLabel": "工具链",
-    "home.metric.stackValue": "Slither + LLM + Foundry",
+    "home.metric.modeValue": "智能审计工作台",
+    "home.metric.stackLabel": "能力",
+    "home.metric.stackValue": "漏洞发现 + 漏洞验证双 Agent",
     "home.metric.outputLabel": "产物",
-    "home.metric.outputValue": "证据包",
-    "home.workflow.title": "审计闭环",
+    "home.metric.outputValue": "审计报告 + 可执行 PoC + 验证结论",
+    "home.workflow.title": "漏洞发现到验证的自动化闭环",
     "home.workflow.parseTitle": "1. 理解项目",
-    "home.workflow.parseText": "解析合约、函数和源码片段，先让审计人员看清项目结构。",
+    "home.workflow.parseText": "自动解析项目结构与关键函数，帮助开发者和审计人员快速建立代码理解。",
     "home.workflow.detectTitle": "2. 发现漏洞",
-    "home.workflow.detectText": "结合静态工具和 LLM 语义审计，提取可疑漏洞线索。",
+    "home.workflow.detectText": "模块化接入静态分析工具与 LLM Agent，自动挖掘潜在漏洞并生成结构化安全结论。",
+    "home.workflow.reportTitle": "3. 输出报告",
+    "home.workflow.reportText": "展示风险等级、漏洞描述和相关合约/函数，不自动进入 PoC 验证。",
     "home.workflow.verifyTitle": "3. 验证漏洞",
-    "home.workflow.verifyText": "生成 Foundry PoC，回放编译/测试日志，并输出最终漏洞结论。",
+    "home.workflow.verifyText": "将自然语言漏洞描述自动转化为 Foundry PoC，执行编译与测试验证，输出最终可执行证据与利用结论。",
     "home.verifyWorkflow.projectTitle": "1. 上传项目",
     "home.verifyWorkflow.projectText": "提供 Solidity 代码库，让 Agent 可以导入合约并构造可运行测试。",
     "home.verifyWorkflow.reportTitle": "2. 粘贴发现",
     "home.verifyWorkflow.reportText": "把外部审计报告或人工审查中的漏洞描述带进来。",
     "home.verifyWorkflow.proofTitle": "3. 证明漏洞",
     "home.verifyWorkflow.proofText": "把报告文本转成 Foundry PoC，并回放编译/测试证据。",
-    "home.value.scan": "快速发现可疑告警",
-    "home.value.llm": "自然语言漏洞推理",
-    "home.value.foundry": "用可执行证据替代静态报告",
+    "home.value.scan": "开源框架，灵活接入审计工具",
+    "home.value.llm": "AI Agent 驱动漏洞发现与验证",
+    "home.value.foundry": "自然语言描述自动生成可执行 PoC",
+    "home.value.report": "输出适合人工复核的漏洞列表",
     "badge.vulnerable": "存在风险",
     "badge.safe": "安全",
     "stream.title": "审计分析",
@@ -185,6 +214,7 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     "stream.verdictExists": "确认存在漏洞",
     "stream.verificationFailed": "验证失败",
     "stream.notVulnerable": "未发现漏洞",
+    "stream.discoveryComplete": "发现完成",
     "flow.pipeline": "流程",
     "flow.verdict": "结论",
     "flow.findings": "发现项",
@@ -236,10 +266,12 @@ const messageTranslations: Record<string, string> = {
   "No vulnerabilities detected": "未检测到漏洞",
   "Forge not installed, skipping PoC verification": "未安装 Forge，已跳过 PoC 验证",
   "Cannot verify without Forge": "缺少 Forge，无法验证",
-  "Loading example project...": "正在加载示例项目...",
-  "Example project loaded": "示例项目已加载",
+  "Loading uploaded project...": "正在加载上传项目...",
+  "Uploaded project loaded": "上传项目已加载",
   "Static analysis complete": "静态分析完成",
   "LLM audit complete": "AI 审计完成",
+  "Discovery complete": "漏洞发现完成",
+  "Verification not requested": "未请求漏洞验证",
   "Testing complete": "测试完成",
   "All repair rounds exhausted": "所有修复轮次已用完",
   "Verification failed after all repair rounds": "所有修复轮次后仍验证失败",

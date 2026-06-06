@@ -152,14 +152,18 @@ export default function FlowPanel({ language, state }: Props) {
                         ? "bg-red-500/15 text-red-400"
                         : state.verdict === "not_exists"
                           ? "bg-emerald-500/15 text-emerald-400"
-                          : "bg-zinc-500/15 text-zinc-400"
+                          : state.verdict === "unknown"
+                            ? "bg-cyan-500/15 text-cyan-300"
+                            : "bg-zinc-500/15 text-zinc-400"
                     }`}
                   >
                     {state.verdict === "exists"
                       ? t("badge.vulnerable")
                       : state.verdict === "not_exists"
                         ? t("badge.safe")
-                        : state.verdict?.toUpperCase()}
+                        : state.verdict === "unknown"
+                          ? t("stream.discoveryComplete")
+                          : state.verdict?.toUpperCase()}
                   </span>
                 )}
               </div>

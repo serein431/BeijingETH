@@ -179,7 +179,7 @@ export function useAuditStream() {
   );
 
   const startExampleReplay = useCallback(
-    (caseId: string, mode: AuditMode = "full_audit") => {
+    (caseId: string, mode: AuditMode = "discover_only") => {
       startStream(`/api/examples/${caseId}/stream?mode=${mode}`);
     },
     [startStream]

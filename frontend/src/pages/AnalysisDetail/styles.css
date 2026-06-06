@@ -550,3 +550,374 @@
     padding: 8px;
   }
 }
+
+/* ============================================================
+ * Product-theme alignment
+ * Match the landing/workbench visual system after project upload.
+ * ============================================================ */
+.analysis-shell {
+  --audit-bg: #050609;
+  --audit-panel: rgba(12, 17, 24, 0.78);
+  --audit-panel-strong: rgba(16, 23, 32, 0.92);
+  --audit-line: rgba(148, 163, 184, 0.14);
+  --audit-line-strong: rgba(103, 232, 249, 0.34);
+  --audit-text: #f4f7fb;
+  --audit-muted: #8b97a8;
+  --audit-cyan: #67e8f9;
+  --audit-emerald: #6ee7b7;
+  background:
+    radial-gradient(circle at 15% 16%, rgba(103, 232, 249, 0.16), transparent 30%),
+    radial-gradient(circle at 82% 22%, rgba(110, 231, 183, 0.12), transparent 30%),
+    linear-gradient(135deg, var(--audit-bg) 0%, #090c11 54%, #050609 100%);
+  color: var(--audit-text);
+}
+
+.analysis-shell::before {
+  top: -18%;
+  left: -12%;
+  width: 58%;
+  height: 62%;
+  background: radial-gradient(closest-side, rgba(103, 232, 249, 0.16), transparent 72%);
+  filter: blur(110px);
+}
+
+.analysis-shell::after {
+  bottom: -24%;
+  right: -12%;
+  width: 54%;
+  height: 62%;
+  background: radial-gradient(closest-side, rgba(110, 231, 183, 0.12), transparent 72%);
+  filter: blur(110px);
+}
+
+.analysis-shell .analysis-body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(103, 232, 249, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(103, 232, 249, 0.035) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.72), transparent 86%);
+}
+
+.analysis-header {
+  border-color: var(--audit-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.016)),
+    rgba(5, 8, 12, 0.72) !important;
+  box-shadow: 0 20px 70px rgba(0, 0, 0, 0.24);
+  z-index: 5;
+}
+
+.analysis-header h1,
+.analysis-main,
+.analysis-tab[data-active="true"],
+.analysis-card,
+.analysis-empty {
+  color: var(--audit-text);
+}
+
+.analysis-header .text-zinc-500,
+.analysis-main .text-zinc-500,
+.analysis-main .text-zinc-600,
+.analysis-empty {
+  color: var(--audit-muted) !important;
+}
+
+.analysis-header .text-zinc-100,
+.analysis-header .text-zinc-200,
+.analysis-header .text-zinc-300 {
+  color: var(--audit-text) !important;
+}
+
+.analysis-header a,
+.analysis-tab,
+.analysis-drawer-trigger,
+.analysis-sidebar-toggle {
+  border-color: var(--audit-line) !important;
+  background: rgba(255, 255, 255, 0.035) !important;
+  color: var(--audit-muted) !important;
+}
+
+.analysis-header a:hover,
+.analysis-tab:hover,
+.analysis-drawer-trigger:hover,
+.analysis-sidebar-toggle:hover {
+  border-color: var(--audit-line-strong) !important;
+  background: rgba(103, 232, 249, 0.08) !important;
+  color: var(--audit-cyan) !important;
+  box-shadow: 0 0 28px rgba(103, 232, 249, 0.1);
+}
+
+.analysis-tabs,
+.analysis-card,
+.analysis-sidebar,
+.analysis-empty-glyph {
+  border-color: var(--audit-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.016)),
+    var(--audit-panel) !important;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.32);
+  backdrop-filter: blur(24px);
+}
+
+.analysis-tab[data-active="true"] {
+  border-color: rgba(103, 232, 249, 0.38) !important;
+  background: rgba(103, 232, 249, 0.1) !important;
+  color: var(--audit-cyan) !important;
+}
+
+.analysis-content > *,
+.analysis-codeviewer-wrap,
+.analysis-detail-meta {
+  filter: none;
+}
+
+.analysis-main {
+  position: relative;
+  z-index: 2;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.018), transparent 42%),
+    rgba(5, 8, 12, 0.2);
+}
+
+.analysis-main > div:first-child {
+  border-color: var(--audit-line) !important;
+  background: rgba(5, 8, 12, 0.58);
+}
+
+.analysis-content {
+  background: rgba(5, 8, 12, 0.28);
+}
+
+.analysis-detail-split {
+  border: 1px solid var(--audit-line);
+  border-radius: 18px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.01)),
+    rgba(12, 17, 24, 0.72);
+  padding: 14px;
+  box-shadow: 0 26px 90px rgba(0, 0, 0, 0.34);
+}
+
+.analysis-codeviewer-wrap > div,
+.analysis-detail-meta > div {
+  border-color: rgba(103, 232, 249, 0.16) !important;
+  background:
+    linear-gradient(180deg, rgba(103, 232, 249, 0.035), transparent),
+    rgba(6, 10, 16, 0.92) !important;
+  box-shadow: 0 22px 70px rgba(0, 0, 0, 0.34) !important;
+}
+
+.analysis-codeviewer-wrap pre,
+.analysis-codeviewer-wrap code {
+  color: #e8f2ff !important;
+}
+
+.analysis-detail-meta .text-zinc-200,
+.analysis-detail-meta .text-zinc-300,
+.analysis-detail-meta .text-zinc-400 {
+  color: var(--audit-text) !important;
+}
+
+.analysis-detail-meta .text-zinc-500,
+.analysis-detail-meta .text-zinc-600 {
+  color: var(--audit-muted) !important;
+}
+
+.analysis-fn-row {
+  color: var(--audit-muted);
+}
+
+.analysis-fn-row:hover:not([data-active="true"]) {
+  background: rgba(103, 232, 249, 0.055) !important;
+  color: var(--audit-text);
+}
+
+.analysis-fn-row[data-active="true"] {
+  color: white;
+  background: rgba(103, 232, 249, 0.09) !important;
+  box-shadow: inset 2px 0 0 var(--audit-cyan), 0 0 24px rgba(103, 232, 249, 0.08);
+}
+
+.analysis-fn-row[data-active="true"]::after {
+  background: var(--audit-cyan);
+  box-shadow: 0 0 12px rgba(103, 232, 249, 0.9);
+}
+
+.react-flow__controls,
+.react-flow__minimap {
+  border: 1px solid var(--audit-line) !important;
+  background: rgba(5, 8, 12, 0.72) !important;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.28);
+}
+
+/* ============================================================
+ * Unified light analysis theme
+ * Final override so the project-structure page matches the light landing and
+ * workbench pages.
+ * ============================================================ */
+.analysis-shell {
+  --light-paper: #f7f3e8;
+  --light-paper-2: #ebe5d7;
+  --light-card: rgba(255, 255, 255, 0.7);
+  --light-card-strong: rgba(255, 255, 255, 0.86);
+  --light-ink: #171613;
+  --light-muted: #625b50;
+  --light-faint: #8a8174;
+  --light-line: rgba(23, 22, 19, 0.14);
+  --light-blue: #245f9f;
+  --light-green: #2f7d52;
+  --light-amber: #b66a20;
+  background:
+    radial-gradient(circle at 15% 16%, rgba(36, 95, 159, 0.14), transparent 30%),
+    radial-gradient(circle at 82% 22%, rgba(47, 125, 82, 0.11), transparent 30%),
+    linear-gradient(135deg, #fbf8ed 0%, var(--light-paper) 48%, var(--light-paper-2) 100%) !important;
+  color: var(--light-ink) !important;
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.analysis-shell::before {
+  background: radial-gradient(closest-side, rgba(36, 95, 159, 0.16), transparent 72%) !important;
+  filter: blur(100px);
+}
+
+.analysis-shell::after {
+  background: radial-gradient(closest-side, rgba(47, 125, 82, 0.12), transparent 72%) !important;
+  filter: blur(100px);
+}
+
+.analysis-shell .analysis-body::before {
+  background-image:
+    linear-gradient(rgba(23, 22, 19, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(23, 22, 19, 0.028) 1px, transparent 1px) !important;
+  background-size: 34px 34px;
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.72), transparent 82%);
+}
+
+.analysis-header,
+.analysis-tabs,
+.analysis-card,
+.analysis-sidebar,
+.analysis-empty-glyph,
+.analysis-detail-split,
+.analysis-codeviewer-wrap > div,
+.analysis-detail-meta > div,
+.react-flow__controls,
+.react-flow__minimap {
+  border-color: var(--light-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.46)),
+    var(--light-card) !important;
+  box-shadow: 10px 12px 0 rgba(23, 22, 19, 0.055) !important;
+  backdrop-filter: blur(14px);
+}
+
+.analysis-main {
+  background: rgba(255, 255, 255, 0.18) !important;
+  color: var(--light-ink) !important;
+}
+
+.analysis-main > div:first-child,
+.analysis-content {
+  border-color: var(--light-line) !important;
+  background: rgba(255, 255, 255, 0.28) !important;
+}
+
+.analysis-header h1,
+.analysis-main,
+.analysis-tab[data-active="true"],
+.analysis-card,
+.analysis-empty,
+.analysis-header .text-zinc-100,
+.analysis-header .text-zinc-200,
+.analysis-header .text-zinc-300,
+.analysis-detail-meta .text-zinc-200,
+.analysis-detail-meta .text-zinc-300,
+.analysis-detail-meta .text-zinc-400 {
+  color: var(--light-ink) !important;
+}
+
+.analysis-header .text-zinc-500,
+.analysis-main .text-zinc-500,
+.analysis-main .text-zinc-600,
+.analysis-empty,
+.analysis-detail-meta .text-zinc-500,
+.analysis-detail-meta .text-zinc-600,
+.analysis-fn-row {
+  color: var(--light-muted) !important;
+}
+
+.analysis-header a,
+.analysis-tab,
+.analysis-drawer-trigger,
+.analysis-sidebar-toggle {
+  border-color: var(--light-line) !important;
+  background: rgba(255, 255, 255, 0.5) !important;
+  color: var(--light-muted) !important;
+}
+
+.analysis-header a:hover,
+.analysis-tab:hover,
+.analysis-drawer-trigger:hover,
+.analysis-sidebar-toggle:hover {
+  border-color: rgba(23, 22, 19, 0.25) !important;
+  background: rgba(255, 255, 255, 0.78) !important;
+  color: var(--light-blue) !important;
+  box-shadow: 8px 8px 0 rgba(23, 22, 19, 0.055) !important;
+}
+
+.analysis-tab[data-active="true"] {
+  border-color: rgba(36, 95, 159, 0.32) !important;
+  background: rgba(36, 95, 159, 0.08) !important;
+  color: var(--light-blue) !important;
+}
+
+.analysis-codeviewer-wrap > div {
+  background: #fffdf8 !important;
+}
+
+.analysis-codeviewer-wrap > div > div:first-child {
+  background: rgba(246, 241, 229, 0.9) !important;
+  border-color: var(--light-line) !important;
+}
+
+.analysis-codeviewer-wrap > div > div:last-child {
+  background: #fffdf8 !important;
+}
+
+.analysis-codeviewer-wrap pre,
+.analysis-codeviewer-wrap code {
+  color: #24211d !important;
+}
+
+.analysis-fn-group-header:hover,
+.analysis-fn-row:hover:not([data-active="true"]) {
+  background: rgba(36, 95, 159, 0.055) !important;
+  color: var(--light-ink) !important;
+}
+
+.analysis-fn-row[data-active="true"] {
+  color: var(--light-blue) !important;
+  background: rgba(36, 95, 159, 0.09) !important;
+  box-shadow: inset 2px 0 0 var(--light-blue), 6px 0 0 rgba(36, 95, 159, 0.04) !important;
+}
+
+.analysis-fn-row[data-active="true"]::after {
+  background: var(--light-blue);
+  box-shadow: 0 0 0 4px rgba(36, 95, 159, 0.12);
+}
+
+.analysis-sidebar input {
+  background: rgba(255, 255, 255, 0.62) !important;
+  border-color: var(--light-line) !important;
+  color: var(--light-ink) !important;
+}
+
+.analysis-loader {
+  border-color: rgba(23, 22, 19, 0.12);
+  border-top-color: var(--light-blue);
+}

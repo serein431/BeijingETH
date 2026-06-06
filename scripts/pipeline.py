@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 import time
 import uuid
 from collections.abc import Generator
@@ -79,6 +80,59 @@ def _build_repair_prompt(original: list[dict[str, str]], previous_code: str, for
             ),
         }
     ]
+
+
+def _example_finding_from_report(case_id: str, report_text: str) -> Vulnerability:
+    title = "Audit report finding"
+    for line in report_text.splitlines():
+        clean = line.strip().lstrip("#").strip()
+        if re.match(r"^(?:[A-Z]\d+|\d+)\.\s+", clean):
+            title = re.sub(r"^(?:[A-Z]\d+|\d+)\.\s+", "", clean).strip()
+            break
+
+    risk = "Unknown"
+    if re.search(r"\bhigh severity\b", report_text, re.IGNORECASE):
+        risk = "High"
+    elif re.search(r"\bmedium severity\b", report_text, re.IGNORECASE):
+        risk = "Medium"
+    elif re.search(r"\blow severity\b", report_text, re.IGNORECASE):
+        risk = "Low"
+
+    fallback_risk_by_case = {
+        "binamon-dos": "High",
+        "cleverminu-approve-race": "High",
+    }
+    if risk == "Unknown":
+        risk = fallback_risk_by_case.get(case_id, risk)
+
+    description = ""
+    match = re.search(
+        r"Description\s+(.*?)(?:\s+Remediation\b|\s+Status:|\Z)",
+        report_text,
+        re.IGNORECASE | re.DOTALL,
+    )
+    if match:
+        description = re.sub(r"\s+", " ", match.group(1)).strip()
+
+    fn_match = re.search(r"\b(?:modifier|function)\s+([A-Za-z_][A-Za-z0-9_]*)", report_text)
+    function_name = fn_match.group(1) if fn_match else None
+    if function_name == "call" and re.search(r"\bapprove\b", report_text, re.IGNORECASE):
+        function_name = "approve"
+
+    contract_by_case = {
+        "binamon-dos": "BNRG",
+        "cleverminu-approve-race": "DoctorShiba",
+    }
+
+    return Vulnerability(
+        id=f"{case_id}-report-1",
+        title=title,
+        description=description or report_text[:400],
+        risk=_risk(risk),
+        contract=contract_by_case.get(case_id),
+        function=function_name,
+        location="audit_report.md",
+    )
 
 
 def run_audit_pipeline(project_id: str, project_root: Path, llm: LLMConfig) -> Generator[str, None, None]:
@@ -214,7 +268,7 @@ def run_audit_pipeline(project_id: str, project_root: Path, llm: LLMConfig) -> G
     yield _sse("verdict", {"verdict": "failed", "message": "Verification failed after all repair rounds"})
 
 
-def replay_as_stream(case_id: str, mode: str = "full_audit") -> Generator[str, None, None]:
+def replay_as_stream(case_id: str, mode: str = "discover_only") -> Generator[str, None, None]:
     from .example_replay import replay_events
 
     events, verdict = replay_events(case_id)
@@ -223,9 +277,9 @@ def replay_as_stream(case_id: str, mode: str = "full_audit") -> Generator[str, N
 
     verify_only = mode == "verify_finding"
 
-    yield _sse("phase", {"phase": "parse", "status": "running", "message": "Loading example project..."})
+    yield _sse("phase", {"phase": "parse", "status": "running", "message": "Loading uploaded project..."})
     time.sleep(0.3)
-    yield _sse("phase", {"phase": "parse", "status": "completed", "message": "Example project loaded"})
+    yield _sse("phase", {"phase": "parse", "status": "completed", "message": "Uploaded project loaded"})
 
     if verify_only:
         yield _sse("phase", {"phase": "slither", "status": "skipped", "message": "Existing report supplied"})
@@ -247,7 +301,17 @@ def replay_as_stream(case_id: str, mode: str = "full_audit") -> Generator[str, N
                 chunk = report_text[i:i + 8]
                 yield _sse("stream", {"phase": "llm_audit", "token": chunk})
                 time.sleep(0.02)
+            yield _sse("finding", {
+                "phase": "llm_audit",
+                "vulnerability": _example_finding_from_report(case_id, report_text).model_dump(),
+            })
             yield _sse("phase", {"phase": "llm_audit", "status": "completed", "message": "LLM audit complete"})
+
+        if not verify_only:
+            yield _sse("phase", {"phase": "poc_gen", "status": "skipped", "message": "Verification not requested"})
+            yield _sse("phase", {"phase": "forge_test", "status": "skipped", "message": "Verification not requested"})
+            yield _sse("verdict", {"verdict": "unknown", "message": "Discovery complete"})
+            return
 
         for entry in log_entries:
             round_no = entry.get("round", 1)

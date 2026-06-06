@@ -37,13 +37,16 @@ function StatChip({
 
 export default function ContractHeader({
   cfgData,
-  caseId,
+  caseId: _caseId,
 }: ContractHeaderProps) {
   const contractCount = cfgData?.contracts.length ?? 0;
   const functionCount = cfgData
     ? Object.keys(cfgData.call_graph).length
     : 0;
   const stateVarCount = cfgData?.public_state_variables.length ?? 0;
+  const projectLabel = cfgData?.contracts[0]?.name
+    ? `${cfgData.contracts[0].name}.sol`
+    : "Uploaded Solidity Project";
 
   return (
     <header className="analysis-header relative flex items-center justify-between gap-6 px-6 py-4 border-b border-white/[0.06] bg-white/[0.015] backdrop-blur-xl">
@@ -71,14 +74,14 @@ export default function ContractHeader({
         <div className="min-w-0">
           <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.22em] text-zinc-500">
             <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400/80 animate-pulse" />
-            Analysis
+            Project Structure
           </div>
           <div className="mt-0.5 flex items-baseline gap-2">
             <h1 className="font-mono text-lg text-zinc-100 truncate">
-              {caseId}
+              {projectLabel}
             </h1>
             <span className="text-xs text-zinc-500 truncate">
-              {cfgData ? cfgData.solc_constraint : "—"}
+              {cfgData ? `${cfgData.solc_constraint} · parsed workspace` : "—"}
             </span>
           </div>
         </div>

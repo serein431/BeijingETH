@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { oneLight } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 export interface CodeViewerProps {
   code: string;
@@ -54,7 +54,7 @@ export default function CodeViewer({
   const lineCount = code ? code.split("\n").length : 0;
 
   return (
-    <div className="flex flex-col h-full min-h-0 bg-[#0d1117] rounded-xl border border-white/[0.06] overflow-hidden shadow-[0_20px_60px_-30px_rgba(99,102,241,0.35)]">
+    <div className="flex flex-col h-full min-h-0 bg-[#fffdf8] rounded-xl border border-white/[0.06] overflow-hidden shadow-[0_20px_60px_-30px_rgba(99,102,241,0.35)]">
       {/* Toolbar */}
       <div className="flex items-center justify-between bg-white/[0.03] border-b border-white/[0.05] px-4 py-2">
         <div className="flex items-center gap-3 min-w-0">
@@ -129,11 +129,11 @@ export default function CodeViewer({
       </div>
 
       {/* Code */}
-      <div className="flex-1 min-h-0 overflow-auto bg-[#0d1117] codeviewer-scroll">
+      <div className="flex-1 min-h-0 overflow-auto bg-[#fffdf8] codeviewer-scroll">
         {code ? (
           <SyntaxHighlighter
             language={language}
-            style={vscDarkPlus}
+            style={oneLight}
             showLineNumbers
             startingLineNumber={startLine}
             wrapLines

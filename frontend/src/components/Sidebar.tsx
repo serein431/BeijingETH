@@ -1,12 +1,18 @@
+import { Link } from "react-router-dom";
 import { createTranslator } from "../i18n";
 import type { Language } from "../types";
 
 interface Props {
   language: Language;
+  showAnalysis: boolean;
   onToggleLanguage: () => void;
 }
 
-export default function Sidebar({ language, onToggleLanguage }: Props) {
+export default function Sidebar({
+  language,
+  showAnalysis,
+  onToggleLanguage,
+}: Props) {
   const t = createTranslator(language);
 
   return (
@@ -44,6 +50,17 @@ export default function Sidebar({ language, onToggleLanguage }: Props) {
             d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"
           />
         </SidebarButton>
+
+        {showAnalysis && (
+          <SidebarButton title={t("nav.analysis")} to="/analysis">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={1.5}
+              d="M4 7h16M4 12h7m-7 5h9m4-5h3m-3 5h3M7 4v6m8 4v6"
+            />
+          </SidebarButton>
+        )}
 
         <SidebarButton title={t("nav.history")}>
           <path
@@ -84,16 +101,16 @@ export default function Sidebar({ language, onToggleLanguage }: Props) {
 
 function SidebarButton({
   title,
+  to,
   children,
 }: {
   title: string;
+  to?: string;
   children: React.ReactNode;
 }) {
-  return (
-    <button
-      className="p-2.5 rounded-xl text-zinc-500 hover:text-white hover:bg-white/5 transition-all w-10 h-10 flex items-center justify-center group relative"
-      title={title}
-    >
+  const className =
+    "p-2.5 rounded-xl text-zinc-500 hover:text-white hover:bg-white/5 transition-all w-10 h-10 flex items-center justify-center group relative";
+  const icon = (
       <svg
         className="w-5 h-5"
         fill="none"
@@ -102,6 +119,19 @@ function SidebarButton({
       >
         {children}
       </svg>
+  );
+
+  if (to) {
+    return (
+      <Link to={to} className={className} title={title}>
+        {icon}
+      </Link>
+    );
+  }
+
+  return (
+    <button className={className} title={title}>
+      {icon}
     </button>
   );
 }

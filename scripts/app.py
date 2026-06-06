@@ -162,7 +162,7 @@ def audit_stream(project_id: str):
 
 
 @app.get("/api/examples/{case_id}/stream")
-def example_stream(case_id: str, mode: str = "full_audit"):
+def example_stream(case_id: str, mode: str = "discover_only"):
     from .config import EXAMPLE_ROOT
     case_dir = (EXAMPLE_ROOT / case_id).resolve()
     if not case_dir.exists():

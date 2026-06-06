@@ -7,7 +7,7 @@ export type PhaseStatus =
   | "error";
 
 export type Language = "en" | "zh";
-export type AuditMode = "full_audit" | "verify_finding";
+export type AuditMode = "discover_only" | "verify_finding";
 
 export interface PhaseState {
   name: string;

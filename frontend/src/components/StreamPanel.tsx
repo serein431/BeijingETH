@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import Markdown from "react-markdown";
+import { Link } from "react-router-dom";
 import { createTranslator, getPhaseLabel, translateStreamText } from "../i18n";
 import type { AuditState, Language } from "../types";
 
@@ -71,6 +72,12 @@ export default function StreamPanel({
           )}
         </div>
         <div className="flex items-center gap-2">
+          <Link
+            to="/analysis"
+            className="text-xs text-cyan-200 hover:text-white px-3 py-1.5 rounded-lg border border-cyan-300/20 bg-cyan-300/[0.055] hover:border-cyan-300/40 hover:bg-cyan-300/[0.1] transition-all"
+          >
+            {t("analysis.open")}
+          </Link>
           {state.isRunning && (
             <button
               onClick={onStop}
@@ -173,6 +180,7 @@ function VerdictBadge({
   const t = createTranslator(language);
   const isVulnerable = verdict === "exists";
   const isFailed = verdict === "failed";
+  const isUnknown = verdict === "unknown";
   return (
     <span
       className={`text-[10px] font-bold px-2.5 py-1 rounded-full ${
@@ -180,14 +188,18 @@ function VerdictBadge({
           ? "bg-red-500/15 text-red-400"
           : isFailed
             ? "bg-zinc-500/15 text-zinc-400"
-            : "bg-emerald-500/15 text-emerald-400"
+            : isUnknown
+              ? "bg-cyan-500/15 text-cyan-300"
+              : "bg-emerald-500/15 text-emerald-400"
       }`}
     >
       {isVulnerable
         ? t("stream.verdictExists")
         : isFailed
           ? t("stream.verificationFailed")
-          : t("stream.notVulnerable")}
+          : isUnknown
+            ? t("stream.discoveryComplete")
+            : t("stream.notVulnerable")}
     </span>
   );
 }

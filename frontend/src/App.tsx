@@ -1,6 +1,7 @@
 import { useCallback, useState } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import FlowPanel from "./components/FlowPanel";
+import LandingPage from "./components/LandingPage";
 import Sidebar from "./components/Sidebar";
 import StreamPanel from "./components/StreamPanel";
 import UploadArea from "./components/UploadArea";
@@ -12,9 +13,10 @@ const DEFAULT_REPLAY_CASE = "binamon-dos";
 
 function MainApp() {
   const { state, startExampleReplay, stop, reset } = useAuditStream();
+  const [enteredApp, setEnteredApp] = useState(false);
   const [started, setStarted] = useState(false);
   const [language, setLanguage] = useState<Language>("en");
-  const [auditMode, setAuditMode] = useState<AuditMode>("full_audit");
+  const [auditMode, setAuditMode] = useState<AuditMode>("discover_only");
 
   const handleToggleLanguage = useCallback(() => {
     setLanguage((current) => (current === "en" ? "zh" : "en"));
@@ -33,13 +35,27 @@ function MainApp() {
     setStarted(false);
   }, [reset]);
 
-  return (
-    <div className="flex h-screen w-screen bg-[#030303] overflow-hidden">
-      <div className="fixed top-[-20%] left-[-10%] w-[50%] h-[60%] bg-indigo-900/20 rounded-full blur-[160px] pointer-events-none mix-blend-screen z-0" />
-      <div className="fixed bottom-[-20%] right-[10%] w-[40%] h-[50%] bg-emerald-900/10 rounded-full blur-[140px] pointer-events-none mix-blend-screen z-0" />
-      <div className="fixed top-[20%] right-[-10%] w-[30%] h-[40%] bg-purple-900/10 rounded-full blur-[140px] pointer-events-none mix-blend-screen z-0" />
+  if (!enteredApp) {
+    return (
+      <LandingPage
+        language={language}
+        onEnterApp={() => setEnteredApp(true)}
+        onToggleLanguage={handleToggleLanguage}
+      />
+    );
+  }
 
-      <Sidebar language={language} onToggleLanguage={handleToggleLanguage} />
+  return (
+    <div className="audit-workbench flex h-screen w-screen overflow-hidden">
+      <div className="audit-workbench-grid" />
+      <div className="audit-workbench-orb audit-workbench-orb-a" />
+      <div className="audit-workbench-orb audit-workbench-orb-b" />
+
+      <Sidebar
+        language={language}
+        showAnalysis={started}
+        onToggleLanguage={handleToggleLanguage}
+      />
 
       <main className="flex-1 flex relative z-10 min-w-0">
         {!started ? (
