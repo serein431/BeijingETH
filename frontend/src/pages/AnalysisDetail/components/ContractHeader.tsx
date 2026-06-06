@@ -18,18 +18,18 @@ function StatChip({
   accent?: "indigo" | "emerald" | "amber";
 }) {
   const palette: Record<string, string> = {
-    indigo: "text-indigo-300 border-indigo-400/30 bg-indigo-500/[0.06]",
-    emerald: "text-emerald-300 border-emerald-400/30 bg-emerald-500/[0.06]",
-    amber: "text-amber-300 border-amber-400/30 bg-amber-500/[0.06]",
+    indigo: "text-indigo-200 border-indigo-300/40 bg-indigo-500/[0.1]",
+    emerald: "text-emerald-200 border-emerald-300/40 bg-emerald-500/[0.1]",
+    amber: "text-amber-200 border-amber-300/40 bg-amber-500/[0.1]",
   };
   const cls = accent
     ? palette[accent]
-    : "text-zinc-200 border-white/10 bg-white/[0.03]";
+    : "text-zinc-100 border-white/15 bg-white/[0.05]";
   return (
     <div
       className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border backdrop-blur ${cls}`}
     >
-      <span className="text-[10px] font-semibold uppercase tracking-[0.18em] opacity-80">
+      <span className="text-[10px] font-bold uppercase tracking-[0.18em] opacity-95">
         {label}
       </span>
       <span className="font-mono text-sm font-bold tabular-nums">{value}</span>
@@ -75,15 +75,15 @@ export default function ContractHeader({
         </Link>
 
         <div className="min-w-0">
-          <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-zinc-400">
+          <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.22em] text-zinc-200">
             <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400/80 animate-pulse" />
             Project Structure
           </div>
           <div className="mt-0.5 flex items-baseline gap-2">
-            <h1 className="font-mono text-lg font-bold text-zinc-100 truncate">
+            <h1 className="font-mono text-lg font-bold text-white truncate">
               {projectLabel}
             </h1>
-            <span className="text-xs font-medium text-zinc-400 truncate">
+            <span className="text-xs font-semibold text-zinc-200 truncate">
               {cfgData ? `${cfgData.solc_constraint} · parsed workspace` : "—"}
             </span>
           </div>

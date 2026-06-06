@@ -277,42 +277,56 @@ def replay_as_stream(case_id: str, mode: str = "discover_only") -> Generator[str
 
     verify_only = mode == "verify_finding"
 
+    # ── Stage 1 & 2 shared: Parse ──
     yield _sse("phase", {"phase": "parse", "status": "running", "message": "Loading uploaded project..."})
-    time.sleep(0.3)
+    time.sleep(0.8)
     yield _sse("phase", {"phase": "parse", "status": "completed", "message": "Uploaded project loaded"})
+    time.sleep(0.4)
 
     if verify_only:
         yield _sse("phase", {"phase": "slither", "status": "skipped", "message": "Existing report supplied"})
+        time.sleep(0.2)
         yield _sse("phase", {"phase": "llm_audit", "status": "skipped", "message": "Discovery skipped for report verification"})
+        time.sleep(0.3)
     else:
+        # ── Stage 1: Slither ──
         yield _sse("phase", {"phase": "slither", "status": "running", "message": "Running static analysis..."})
-        time.sleep(0.5)
+        time.sleep(1.2)
         yield _sse("phase", {"phase": "slither", "status": "completed", "message": "Static analysis complete"})
+        time.sleep(0.5)
 
     if log_path.exists():
         data = json.loads(log_path.read_text(encoding="utf-8"))
         log_entries = data.get("log", [])
 
+        # ── Stage 1: LLM Audit ──
         audit_report_path = case_dir / "audit_report.md"
         if audit_report_path.exists() and not verify_only:
             yield _sse("phase", {"phase": "llm_audit", "status": "running", "message": "Running LLM security audit..."})
+            time.sleep(0.3)
             report_text = audit_report_path.read_text(encoding="utf-8", errors="ignore")
             for i in range(0, len(report_text), 8):
                 chunk = report_text[i:i + 8]
                 yield _sse("stream", {"phase": "llm_audit", "token": chunk})
                 time.sleep(0.02)
+            time.sleep(0.4)
             yield _sse("finding", {
                 "phase": "llm_audit",
                 "vulnerability": _example_finding_from_report(case_id, report_text).model_dump(),
             })
+            time.sleep(0.3)
             yield _sse("phase", {"phase": "llm_audit", "status": "completed", "message": "LLM audit complete"})
 
+        # Stage 1 (discover_only): stop after discovery, skip PoC & Forge
         if not verify_only:
+            time.sleep(0.3)
             yield _sse("phase", {"phase": "poc_gen", "status": "skipped", "message": "Verification not requested"})
             yield _sse("phase", {"phase": "forge_test", "status": "skipped", "message": "Verification not requested"})
+            time.sleep(0.2)
             yield _sse("verdict", {"verdict": "unknown", "message": "Discovery complete"})
             return
 
+        # ── Stage 2: PoC Generation + Forge Test ──
         for entry in log_entries:
             round_no = entry.get("round", 1)
             response = entry.get("response", "")
@@ -320,6 +334,7 @@ def replay_as_stream(case_id: str, mode: str = "discover_only") -> Generator[str
             exp = entry.get("exp", "")
 
             yield _sse("phase", {"phase": "poc_gen", "status": "running", "message": f"Generating PoC (round {round_no})..."})
+            time.sleep(0.5)
 
             display_text = response if response else exp
             if display_text:
@@ -329,16 +344,40 @@ def replay_as_stream(case_id: str, mode: str = "discover_only") -> Generator[str
                     time.sleep(0.01)
 
             if exp:
+                time.sleep(0.3)
                 yield _sse("poc", {"round": round_no, "code": exp})
 
             if error:
+                time.sleep(0.4)
                 yield _sse("phase", {"phase": "forge_test", "status": "running", "message": f"Running Forge test (round {round_no})..."})
-                time.sleep(0.3)
+                time.sleep(0.8)
                 passed = "Suite result: ok" in error
+                # Stream the forge output text into the terminal
+                yield _sse("stream", {"phase": "forge_test", "token": f"\n\n```\n{error[-3000:]}\n```\n"})
+                time.sleep(0.2)
                 yield _sse("test", {"round": round_no, "output": error[-10000:], "passed": passed})
 
-    yield _sse("phase", {"phase": "forge_test", "status": "completed", "message": "Testing complete"})
+        poc_lines = len(log_entries[-1].get("exp", "").splitlines()) if log_entries else 0
+        time.sleep(0.3)
+        yield _sse("phase", {"phase": "poc_gen", "status": "completed", "message": f"PoC generated — {poc_lines} lines of Foundry test"})
 
+    # ── Final Forge verification from forge_run_output.txt ──
+    forge_output_path = case_dir / "forge_run_output.txt"
+    if forge_output_path.exists():
+        forge_text = forge_output_path.read_text(encoding="utf-8", errors="ignore")
+        time.sleep(0.4)
+        yield _sse("phase", {"phase": "forge_test", "status": "running", "message": "Running final Forge verification..."})
+        time.sleep(1.0)
+        # Stream forge output into the audit terminal
+        yield _sse("stream", {"phase": "forge_test", "token": f"\n\n```\n{forge_text}\n```\n"})
+        time.sleep(0.3)
+        yield _sse("test", {"round": "final", "output": forge_text, "passed": "[PASS]" in forge_text})
+        time.sleep(0.3)
+        yield _sse("phase", {"phase": "forge_test", "status": "completed", "message": "Testing complete"})
+    else:
+        yield _sse("phase", {"phase": "forge_test", "status": "completed", "message": "Testing complete"})
+
+    time.sleep(0.5)
     for ev in events:
         if ev.type == "verdict":
             yield _sse("verdict", {"verdict": verdict, "message": ev.message})

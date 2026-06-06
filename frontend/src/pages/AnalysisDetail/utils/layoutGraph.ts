@@ -1,5 +1,5 @@
 import ELK from "elkjs/lib/elk.bundled.js";
-import type { Edge, Node } from "@xyflow/react";
+import { MarkerType, type Edge, type Node } from "@xyflow/react";
 import type { CallGraphEntry } from "../types";
 
 export interface CallGraphNodeData extends Record<string, unknown> {
@@ -9,13 +9,21 @@ export interface CallGraphNodeData extends Record<string, unknown> {
   isModifier: boolean;
 }
 
-export interface LayoutResult {
-  nodes: Node<CallGraphNodeData>[];
-  edges: Edge[];
+export interface CallGraphEdgeData extends Record<string, unknown> {
+  sourceContract: string;
 }
 
-const NODE_WIDTH = 180;
-const NODE_HEIGHT = 50;
+export interface LayoutResult {
+  nodes: Node<CallGraphNodeData>[];
+  edges: Edge<CallGraphEdgeData>[];
+}
+
+const NODE_WIDTH = 218;
+const NODE_HEIGHT = 62;
+
+const BASE_EDGE_INK = "#3d3833";
+
+export const EDGE_INK = BASE_EDGE_INK;
 
 const elk = new ELK();
 
@@ -58,8 +66,8 @@ export async function layoutCallGraph(
     layoutOptions: {
       "elk.algorithm": "layered",
       "elk.direction": direction === "TB" ? "DOWN" : "RIGHT",
-      "elk.layered.spacing.nodeNodeBetweenLayers": "100",
-      "elk.spacing.nodeNode": "60",
+      "elk.layered.spacing.nodeNodeBetweenLayers": "110",
+      "elk.spacing.nodeNode": "54",
       "elk.layered.nodePlacement.strategy": "NETWORK_SIMPLEX",
       "elk.layered.crossingMinimization.semiInteractive": "true",
       "elk.edgeRouting": "ORTHOGONAL",
@@ -89,27 +97,43 @@ export async function layoutCallGraph(
     }
   );
 
-  const flowEdges: Edge[] = elkEdges.map((e) => ({
-    id: e.id,
-    source: e.sources[0],
-    target: e.targets[0],
-    animated: false,
-    style: { stroke: "#6366f1", strokeWidth: 1.5, opacity: 0.55 },
-  }));
+  const flowEdges: Edge<CallGraphEdgeData>[] = elkEdges.map((e) => {
+    const source = e.sources[0];
+    const sourceEntry = callGraph[source];
+    const sourceContract = sourceEntry?.contract ?? "Unknown";
+    return {
+      id: e.id,
+      source,
+      target: e.targets[0],
+      type: "default", // bezier
+      animated: false,
+      data: { sourceContract },
+      style: { stroke: BASE_EDGE_INK, strokeWidth: 1.4, opacity: 0.32 },
+      markerEnd: {
+        type: MarkerType.ArrowClosed,
+        color: BASE_EDGE_INK,
+        width: 16,
+        height: 16,
+      },
+    } as Edge<CallGraphEdgeData>;
+  });
 
   return { nodes: positionedNodes, edges: flowEdges };
 }
 
-// Deterministic contract-color mapping.
+// Deterministic contract-color mapping — saturated mid-dark hues that
+// sit beautifully on warm paper (#f7f3e8). Avoid pastels.
 const CONTRACT_PALETTE = [
-  "#6366f1", // indigo
-  "#10b981", // emerald
-  "#f59e0b", // amber
-  "#ef4444", // rose
-  "#8b5cf6", // violet
-  "#06b6d4", // cyan
-  "#ec4899", // pink
-  "#84cc16", // lime
+  "#1f4f8b", // deep azure
+  "#0f7a55", // forest emerald
+  "#a4541a", // burnt amber
+  "#a52a3a", // rust crimson
+  "#5a3aa8", // royal violet
+  "#136d83", // teal ink
+  "#a32d6f", // magenta plum
+  "#5d6e1a", // olive moss
+  "#7a4b15", // walnut
+  "#2d5e6f", // slate ocean
 ];
 
 function hashString(str: string): number {

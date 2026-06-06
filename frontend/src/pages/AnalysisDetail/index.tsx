@@ -28,10 +28,10 @@ function TabButton({
   badgeAccent?: "red" | "amber" | "emerald" | "zinc";
 }) {
   const accentMap: Record<string, string> = {
-    red: "bg-red-500/20 text-red-300 border-red-500/40",
-    amber: "bg-amber-500/20 text-amber-300 border-amber-500/40",
-    emerald: "bg-emerald-500/20 text-emerald-300 border-emerald-500/40",
-    zinc: "bg-white/[0.06] text-zinc-300 border-white/10",
+    red: "bg-red-500/25 text-red-200 border-red-400/50",
+    amber: "bg-amber-500/25 text-amber-200 border-amber-400/50",
+    emerald: "bg-emerald-500/25 text-emerald-200 border-emerald-400/50",
+    zinc: "bg-white/[0.08] text-zinc-100 border-white/20",
   };
   const cls = badgeAccent ? accentMap[badgeAccent] : accentMap.zinc;
   return (
@@ -276,30 +276,30 @@ export default function AnalysisDetail() {
               </div>
             </div>
 
-            <div className="flex items-center gap-3 text-[11px] font-medium text-zinc-400 min-w-0">
+            <div className="flex items-center gap-3 text-[11px] font-semibold text-zinc-200 min-w-0">
               {loading && (
                 <>
                   <span className="analysis-loader" />
-                  <span className="font-semibold">Loading analysis…</span>
+                  <span className="font-bold">Loading analysis…</span>
                 </>
               )}
               {error && (
-                <span className="text-rose-400 font-mono font-semibold truncate" title={error}>
+                <span className="text-rose-300 font-mono font-bold truncate" title={error}>
                   ! {error}
                 </span>
               )}
               {!loading && !error && selectedEntry && showSidebar && (
-                <span className="font-mono font-semibold text-zinc-300 truncate max-w-[360px]">
+                <span className="font-mono font-bold text-zinc-100 truncate max-w-[360px]">
                   {selectedEntry.contract}.{selectedEntry.full_name}
                 </span>
               )}
               {!loading && !error && activeTab === "vulnerabilities" && (
-                <span className="font-mono font-semibold text-zinc-300 truncate max-w-[360px]">
+                <span className="font-mono font-bold text-zinc-100 truncate max-w-[360px]">
                   {vulnCount} finding{vulnCount === 1 ? "" : "s"}
                 </span>
               )}
               {!loading && !error && activeTab === "execution" && (
-                <span className="font-mono font-semibold text-zinc-300 truncate max-w-[360px]">
+                <span className="font-mono font-bold text-zinc-100 truncate max-w-[360px]">
                   forge run output
                 </span>
               )}

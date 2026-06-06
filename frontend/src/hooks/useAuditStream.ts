@@ -137,12 +137,33 @@ export function useAuditStream() {
       }
       case "poc": {
         const code = data.code as string;
-        setState((prev) => ({ ...prev, pocCode: code }));
+        const pocRound = data.round as number;
+        const lineCount = code ? code.split("\n").length : 0;
+        setState((prev) => ({
+          ...prev,
+          pocCode: code,
+          streamText:
+            prev.streamText +
+            `\n\n> **PoC Generated (Round ${pocRound || 1})** — ${lineCount} lines of Foundry test\n`,
+        }));
         break;
       }
       case "test": {
         const output = data.output as string;
-        setState((prev) => ({ ...prev, testOutput: output }));
+        const testPassed = data.passed as boolean;
+        const testRound = data.round;
+        const roundLabel =
+          testRound === "final" ? "Final" : `Round ${testRound}`;
+        const passLine = output.match(/\[PASS\]\s+\S+/)?.[0];
+        const failLine = output.match(/\[FAIL[^\]]*\]\s+\S+/)?.[0];
+        const resultLine = passLine || failLine || "";
+        setState((prev) => ({
+          ...prev,
+          testOutput: output,
+          streamText:
+            prev.streamText +
+            `\n\n> **Forge Test (${roundLabel}):** ${testPassed ? "PASSED" : "FAILED"}${resultLine ? ` — ${resultLine}` : ""}\n`,
+        }));
         break;
       }
       case "verdict": {

@@ -70,7 +70,10 @@ export type TranslationKey =
   | "stream.discoveryComplete"
   | "flow.pipeline"
   | "flow.verdict"
-  | "flow.findings";
+  | "flow.findings"
+  | "flow.testResult"
+  | "flow.pocGenerated"
+  | "flow.linesOfFoundryTest";
 
 const translations: Record<Language, Record<TranslationKey, string>> = {
   en: {
@@ -145,6 +148,9 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     "flow.pipeline": "Pipeline",
     "flow.verdict": "Verdict",
     "flow.findings": "Findings",
+    "flow.testResult": "Test Result",
+    "flow.pocGenerated": "PoC Generated",
+    "flow.linesOfFoundryTest": "lines of Foundry test code",
   },
   zh: {
     "nav.projects": "项目",
@@ -218,6 +224,9 @@ const translations: Record<Language, Record<TranslationKey, string>> = {
     "flow.pipeline": "流程",
     "flow.verdict": "结论",
     "flow.findings": "发现项",
+    "flow.testResult": "测试结果",
+    "flow.pocGenerated": "PoC 已生成",
+    "flow.linesOfFoundryTest": "行 Foundry 测试代码",
   },
 };
 

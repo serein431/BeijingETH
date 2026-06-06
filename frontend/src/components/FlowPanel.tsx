@@ -13,8 +13,10 @@ interface Props {
   state: AuditState;
 }
 
-type ExpandablePhase = "parse" | "slither";
-const EXPANDABLE_PHASES: ExpandablePhase[] = ["parse", "slither"];
+type ExpandablePhase = "slither";
+const EXPANDABLE_PHASES: ExpandablePhase[] = [
+  "slither",
+];
 
 function isExpandablePhase(name: string): name is ExpandablePhase {
   return (EXPANDABLE_PHASES as string[]).includes(name);
@@ -75,8 +77,9 @@ export default function FlowPanel({ language, state }: Props) {
     event: React.MouseEvent<HTMLElement>,
   ) => {
     if (!isExpandablePhase(phaseName)) return;
+    event.stopPropagation();
     const rect = event.currentTarget.getBoundingClientRect();
-    setPopoverPosition({ x: rect.right + 12, y: rect.top });
+    setPopoverPosition({ x: rect.left - 292, y: rect.top });
     setPopoverPhase((prev) => (prev === phaseName ? null : phaseName));
   };
 
@@ -152,23 +155,23 @@ export default function FlowPanel({ language, state }: Props) {
                 <div className="flex-1 min-w-0 pt-2">
                   <div className="flex items-center justify-between mb-1">
                     <span
-                      className={`text-sm font-medium flex items-center gap-1.5 ${
+                      className={`text-sm font-semibold flex items-center gap-1.5 ${
                         phase.status === "running"
                           ? "text-white"
                           : phase.status === "completed"
-                            ? "text-zinc-200"
+                            ? "text-zinc-100"
                             : phase.status === "error"
-                              ? "text-red-400"
-                              : "text-zinc-500"
+                              ? "text-red-300"
+                              : "text-zinc-300"
                       }`}
                     >
                       {getPhaseLabel(language, phase.name, phase.label)}
                       {isExpandablePhase(phase.name) && (
                         <svg
-                          className={`w-3 h-3 text-zinc-600 transition-all ${
+                          className={`w-3 h-3 text-zinc-300 transition-all ${
                             popoverPhase === phase.name
-                              ? "text-indigo-400 translate-x-0.5"
-                              : "group-hover:text-indigo-300"
+                              ? "text-indigo-300 translate-x-0.5"
+                              : "group-hover:text-indigo-200"
                           }`}
                           fill="none"
                           viewBox="0 0 24 24"
@@ -186,10 +189,34 @@ export default function FlowPanel({ language, state }: Props) {
                     <StatusBadge language={language} status={phase.status} />
                   </div>
                   {phase.message && (
-                    <p className="text-[11px] text-zinc-500 leading-relaxed mt-0.5 line-clamp-2">
+                    <p className="text-[11px] text-zinc-200 font-medium leading-relaxed mt-0.5 line-clamp-2">
                       {translatePipelineMessage(language, phase.message)}
                     </p>
                   )}
+                  {phase.name === "forge_test" &&
+                    phase.status === "completed" &&
+                    state.testOutput && (
+                      <div className="mt-2 px-2.5 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-[10.5px] font-mono">
+                        <div className="text-emerald-200 font-bold uppercase tracking-[0.14em] text-[9.5px]">
+                          {t("flow.testResult")}
+                        </div>
+                        <div className="text-zinc-100 mt-1 break-all leading-snug">
+                          {extractTestSummary(state.testOutput)}
+                        </div>
+                      </div>
+                    )}
+                  {phase.name === "poc_gen" &&
+                    phase.status === "completed" &&
+                    state.pocCode && (
+                      <div className="mt-2 px-2.5 py-1.5 rounded-lg bg-indigo-500/10 border border-indigo-500/30 text-[10.5px] font-mono">
+                        <div className="text-indigo-200 font-bold uppercase tracking-[0.14em] text-[9.5px]">
+                          {t("flow.pocGenerated")}
+                        </div>
+                        <div className="text-zinc-100 mt-1 leading-snug">
+                          {state.pocCode.split("\n").length} {t("flow.linesOfFoundryTest")}
+                        </div>
+                      </div>
+                    )}
                 </div>
               </div>
             </div>
@@ -200,8 +227,8 @@ export default function FlowPanel({ language, state }: Props) {
             <div className="flex-1 min-w-0 pt-2">
               <div className="flex items-center justify-between mb-1">
                 <span
-                  className={`text-sm font-medium ${
-                    hasVerdict ? "text-white" : "text-zinc-500"
+                  className={`text-sm font-semibold ${
+                    hasVerdict ? "text-white" : "text-zinc-300"
                   }`}
                 >
                   {t("flow.verdict")}
@@ -210,12 +237,12 @@ export default function FlowPanel({ language, state }: Props) {
                   <span
                     className={`text-[9px] font-bold px-2 py-0.5 rounded ${
                       state.verdict === "exists"
-                        ? "bg-red-500/15 text-red-400"
+                        ? "bg-red-500/25 text-red-200"
                         : state.verdict === "not_exists"
-                          ? "bg-emerald-500/15 text-emerald-400"
+                          ? "bg-emerald-500/25 text-emerald-200"
                           : state.verdict === "unknown"
-                            ? "bg-cyan-500/15 text-cyan-300"
-                            : "bg-zinc-500/15 text-zinc-400"
+                            ? "bg-cyan-500/25 text-cyan-200"
+                            : "bg-zinc-500/25 text-zinc-200"
                     }`}
                   >
                     {state.verdict === "exists"
@@ -229,7 +256,7 @@ export default function FlowPanel({ language, state }: Props) {
                 )}
               </div>
               {state.verdictMessage && (
-                <p className="text-[11px] text-zinc-500 leading-relaxed mt-0.5">
+                <p className="text-[11px] text-zinc-200 font-medium leading-relaxed mt-0.5">
                   {translatePipelineMessage(language, state.verdictMessage)}
                 </p>
               )}
@@ -239,33 +266,33 @@ export default function FlowPanel({ language, state }: Props) {
 
         {state.findings.length > 0 && (
           <div className="mt-8 pt-6 border-t border-white/[0.06]">
-            <h3 className="text-[10px] font-semibold text-zinc-500 uppercase tracking-widest mb-3">
+            <h3 className="text-[10px] font-bold text-zinc-200 uppercase tracking-widest mb-3">
               {t("flow.findings")} ({state.findings.length})
             </h3>
             <div className="space-y-2">
               {state.findings.map((f, i) => (
                 <div
                   key={i}
-                  className="bg-white/[0.02] border border-white/[0.04] rounded-lg p-3"
+                  className="bg-white/[0.04] border border-white/[0.08] rounded-lg p-3"
                 >
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs font-medium text-zinc-200 truncate">
+                    <span className="text-xs font-semibold text-white truncate">
                       {f.title}
                     </span>
                     <span
                       className={`text-[9px] font-bold px-1.5 py-0.5 rounded shrink-0 ml-2 ${
                         f.risk === "High" || f.risk === "Critical"
-                          ? "bg-red-500/15 text-red-400"
+                          ? "bg-red-500/25 text-red-200"
                           : f.risk === "Medium"
-                            ? "bg-amber-500/15 text-amber-400"
-                            : "bg-blue-500/15 text-blue-400"
+                            ? "bg-amber-500/25 text-amber-200"
+                            : "bg-blue-500/25 text-blue-200"
                       }`}
                     >
                       {translateRisk(language, f.risk)}
                     </span>
                   </div>
                   {f.contract && (
-                    <span className="text-[10px] font-mono text-zinc-600">
+                    <span className="text-[10px] font-mono font-semibold text-zinc-300">
                       {f.contract}
                     </span>
                   )}
@@ -280,6 +307,7 @@ export default function FlowPanel({ language, state }: Props) {
           phase={popoverPhase}
           position={popoverPosition}
           onClose={() => setPopoverPhase(null)}
+          testOutput={null}
         />
       )}
     </aside>
@@ -379,7 +407,7 @@ function PhaseNode({
         </svg>
       ) : (
         <svg
-          className={`w-4 h-4 ${isActive ? "text-zinc-300" : "text-zinc-600"}`}
+          className={`w-4 h-4 ${isActive ? "text-zinc-200" : "text-zinc-400"}`}
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -458,7 +486,7 @@ function VerdictNode({
         </svg>
       ) : (
         <svg
-          className="w-4 h-4 text-zinc-600"
+          className="w-4 h-4 text-zinc-400"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -473,6 +501,25 @@ function VerdictNode({
       )}
     </div>
   );
+}
+
+function extractTestSummary(output: string): string {
+  if (!output) return "";
+  const passMatch = output.match(/\[PASS\]\s+([\w$]+)\(\)\s*\(gas:\s*([\d,]+)\)/);
+  const failMatch = output.match(/\[FAIL[^\]]*\]\s+([\w$]+)\(\)/);
+  if (passMatch) {
+    return `✓ ${passMatch[1]}() — gas: ${passMatch[2]}`;
+  }
+  if (failMatch) {
+    return `✗ ${failMatch[1]}() — FAILED`;
+  }
+  const summary = output.match(/(\d+)\s+passed[^\n]*?(\d+)\s+failed/i);
+  if (summary) {
+    return `${summary[1]} passed · ${summary[2]} failed`;
+  }
+  const lines = output.trim().split("\n").filter((l) => l.trim().length > 0);
+  const last = lines[lines.length - 1] || "";
+  return last.length > 90 ? `${last.slice(0, 87)}…` : last || "Test completed";
 }
 
 function translateRisk(language: Language, risk: string) {
@@ -499,22 +546,22 @@ function StatusBadge({
     { className: string }
   > = {
     pending: {
-      className: "bg-white/5 text-zinc-500",
+      className: "bg-white/10 text-zinc-200",
     },
     running: {
-      className: "bg-indigo-500/15 text-indigo-400",
+      className: "bg-indigo-500/25 text-indigo-200",
     },
     completed: {
-      className: "bg-emerald-500/15 text-emerald-400",
+      className: "bg-emerald-500/25 text-emerald-200",
     },
     skipped: {
-      className: "bg-zinc-500/10 text-zinc-500",
+      className: "bg-zinc-500/20 text-zinc-200",
     },
     retrying: {
-      className: "bg-amber-500/15 text-amber-400",
+      className: "bg-amber-500/25 text-amber-200",
     },
     error: {
-      className: "bg-red-500/15 text-red-400",
+      className: "bg-red-500/25 text-red-200",
     },
   };
   const c = config[status] || config.pending;

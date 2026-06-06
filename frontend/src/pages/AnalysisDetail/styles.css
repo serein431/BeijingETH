@@ -922,6 +922,144 @@
   border-top-color: var(--light-blue);
 }
 
+/* ----------------------------------------------------------------
+ * Vulnerabilities tab — SlitherResults light-theme contrast fixes.
+ * The component ships with hard-coded Tailwind tints (text-red-300,
+ * bg-white/[0.02], text-white …) that disappear against the warm
+ * paper background. We remap them here so every severity badge,
+ * card and meta label is readable on the bright surface, while
+ * keeping the embedded code blocks dark for legibility.
+ * ---------------------------------------------------------------- */
+
+/* Severity text accents — bump tailwind -200/-300 to -700 hues */
+.analysis-shell .text-red-200,
+.analysis-shell .text-red-300 {
+  color: #b91c1c !important; /* red-700 */
+}
+.analysis-shell .text-amber-200,
+.analysis-shell .text-amber-300 {
+  color: #b45309 !important; /* amber-700 */
+}
+.analysis-shell .text-blue-200,
+.analysis-shell .text-blue-300 {
+  color: #1d4ed8 !important; /* blue-700 */
+}
+.analysis-shell .text-indigo-100,
+.analysis-shell .text-indigo-200,
+.analysis-shell .text-indigo-300 {
+  color: #4338ca !important; /* indigo-700 */
+}
+.analysis-shell .text-emerald-200,
+.analysis-shell .text-emerald-300,
+.analysis-shell .text-emerald-400 {
+  color: #047857 !important; /* emerald-700 */
+}
+.analysis-shell .text-green-200,
+.analysis-shell .text-green-300 {
+  color: #15803d !important; /* green-700 */
+}
+.analysis-shell .text-zinc-200 {
+  color: #2a2a2a !important;
+}
+.analysis-shell .text-zinc-300 {
+  color: #3f3f3f !important;
+}
+.analysis-shell .text-zinc-400 {
+  color: var(--light-muted) !important;
+}
+.analysis-shell .text-zinc-500,
+.analysis-shell .text-zinc-600 {
+  color: var(--light-faint) !important;
+}
+
+/* Severity badge backgrounds — softened, low-saturation tints */
+.analysis-shell .bg-red-500\/25,
+.analysis-shell .bg-red-500\/15 {
+  background-color: rgba(185, 28, 28, 0.12) !important;
+  border-color: rgba(185, 28, 28, 0.32) !important;
+}
+.analysis-shell .bg-amber-500\/25,
+.analysis-shell .bg-amber-500\/15 {
+  background-color: rgba(180, 83, 9, 0.12) !important;
+  border-color: rgba(180, 83, 9, 0.32) !important;
+}
+.analysis-shell .bg-blue-500\/25,
+.analysis-shell .bg-blue-500\/15 {
+  background-color: rgba(29, 78, 216, 0.12) !important;
+  border-color: rgba(29, 78, 216, 0.32) !important;
+}
+.analysis-shell .bg-zinc-500\/25,
+.analysis-shell .bg-zinc-500\/15 {
+  background-color: rgba(82, 82, 91, 0.12) !important;
+  border-color: rgba(82, 82, 91, 0.32) !important;
+}
+
+/* SlitherResults stat card + vulnerability cards — opaque paper tone */
+.analysis-shell .slither-card,
+.analysis-shell .slither-stat,
+.analysis-shell .bg-white\/\[0\.02\],
+.analysis-shell .bg-white\/\[0\.025\],
+.analysis-shell .bg-white\/\[0\.03\],
+.analysis-shell .bg-white\/\[0\.035\],
+.analysis-shell .bg-white\/\[0\.04\] {
+  background-color: rgba(255, 255, 255, 0.78) !important;
+  border-color: rgba(23, 22, 19, 0.16) !important;
+  box-shadow: 6px 8px 0 rgba(23, 22, 19, 0.045) !important;
+}
+
+/* Title + body copy on vulnerability cards */
+.analysis-shell .slither-card .text-white,
+.analysis-shell .slither-stat .text-white {
+  color: var(--light-ink, #171613) !important;
+}
+.analysis-shell .slither-card .text-zinc-100,
+.analysis-shell .slither-stat .text-zinc-100 {
+  color: #1f1f1f !important;
+}
+
+/* Locations toggle button — restore visible border + text */
+.analysis-shell .slither-card button {
+  background-color: rgba(255, 255, 255, 0.7) !important;
+  border-color: rgba(23, 22, 19, 0.18) !important;
+  color: var(--light-ink) !important;
+}
+.analysis-shell .slither-card button:hover {
+  background-color: rgba(255, 255, 255, 0.92) !important;
+  border-color: rgba(23, 22, 19, 0.32) !important;
+}
+
+/* Code blocks inside SlitherResults stay dark for legibility */
+.analysis-shell .slither-card pre,
+.analysis-shell .slither-card code {
+  background-color: #0a0e14 !important;
+  color: #e4e7ef !important;
+}
+.analysis-shell .slither-card .bg-black\/40,
+.analysis-shell .slither-card .bg-white\/\[0\.015\] {
+  background-color: rgba(13, 18, 26, 0.94) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+/* File header inside the dark code block — light text on dark surface */
+.analysis-shell .slither-card .bg-black\/40 .text-white,
+.analysis-shell .slither-card .bg-black\/40 .text-zinc-100,
+.analysis-shell .slither-card .bg-black\/40 .text-zinc-200,
+.analysis-shell .slither-card .bg-black\/40 .text-zinc-300 {
+  color: #f4f4f5 !important;
+}
+.analysis-shell .slither-card .bg-black\/40 .text-indigo-200,
+.analysis-shell .slither-card .bg-black\/40 .text-indigo-300 {
+  color: #c7d2fe !important;
+}
+
+/* Empty state "clean" panel keeps a green accent that reads on paper */
+.analysis-shell .border-emerald-400\/30 {
+  border-color: rgba(4, 120, 87, 0.4) !important;
+}
+.analysis-shell .bg-emerald-500\/10,
+.analysis-shell .bg-emerald-500\/20 {
+  background-color: rgba(4, 120, 87, 0.12) !important;
+}
+
 /* ============================================================
  * Font-weight reinforcement
  * Bump default text weight inside the analysis page so labels,
@@ -977,3 +1115,902 @@
 .analysis-codeviewer-wrap .font-semibold {
   font-weight: 700;
 }
+
+/* ============================================================
+ * Vulnerabilities tab — split layout (AI advisor + cards)
+ * ============================================================ */
+.slither-layout {
+  height: 100%;
+}
+
+.slither-split-chat {
+  width: 40%;
+  min-width: 320px;
+  max-width: 480px;
+}
+
+@media (max-width: 1100px) {
+  .slither-split {
+    flex-direction: column !important;
+  }
+  .slither-split-chat {
+    width: 100% !important;
+    max-width: none !important;
+    height: 360px;
+  }
+}
+
+.slither-cards-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(23, 22, 19, 0.18) transparent;
+}
+.slither-cards-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+.slither-cards-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.slither-cards-scroll::-webkit-scrollbar-thumb {
+  background: rgba(23, 22, 19, 0.18);
+  border-radius: 999px;
+}
+.slither-cards-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(23, 22, 19, 0.32);
+}
+
+/* ============================================================
+ * VulnChat — AI Security Advisor panel
+ * ============================================================ */
+.vuln-chat {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  border-radius: 16px;
+  border: 1px solid rgba(23, 22, 19, 0.16);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.62)),
+    rgba(255, 255, 255, 0.7);
+  box-shadow: 8px 10px 0 rgba(23, 22, 19, 0.05);
+  overflow: hidden;
+  font-family: Georgia, "Times New Roman", serif;
+  color: #171613;
+  animation: analysis-fade-in 0.45s ease-out both;
+}
+
+.vuln-chat__header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(23, 22, 19, 0.1);
+  background:
+    linear-gradient(180deg, rgba(36, 95, 159, 0.06), transparent),
+    rgba(255, 255, 255, 0.55);
+}
+
+.vuln-chat__avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 10px;
+  border: 1px solid rgba(36, 95, 159, 0.32);
+  background: rgba(36, 95, 159, 0.1);
+  color: #245f9f;
+}
+
+.vuln-chat__title {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.vuln-chat__title-main {
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  color: #171613;
+}
+.vuln-chat__title-sub {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+  font-family: "JetBrains Mono", "Fira Code", Menlo, monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #5a5a5a;
+  font-weight: 600;
+}
+.vuln-chat__pulse {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #2f7d52;
+  box-shadow: 0 0 0 0 rgba(47, 125, 82, 0.6);
+  animation: vuln-chat-pulse 2.2s ease-in-out infinite;
+}
+@keyframes vuln-chat-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(47, 125, 82, 0.55); }
+  50%      { box-shadow: 0 0 0 6px rgba(47, 125, 82, 0); }
+}
+
+.vuln-chat__messages {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(23, 22, 19, 0.18) transparent;
+}
+.vuln-chat__messages::-webkit-scrollbar {
+  width: 6px;
+}
+.vuln-chat__messages::-webkit-scrollbar-thumb {
+  background: rgba(23, 22, 19, 0.18);
+  border-radius: 999px;
+}
+
+.vuln-chat__msg {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  animation: analysis-fade-in 0.3s ease-out both;
+}
+.vuln-chat__msg--user {
+  flex-direction: row-reverse;
+}
+
+.vuln-chat__msg-avatar {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  border: 1px solid rgba(36, 95, 159, 0.3);
+  background: rgba(36, 95, 159, 0.08);
+  color: #245f9f;
+}
+
+.vuln-chat__msg-bubble {
+  max-width: 86%;
+  padding: 10px 12px;
+  border-radius: 14px;
+  font-size: 13px;
+  line-height: 1.55;
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
+}
+.vuln-chat__msg--ai .vuln-chat__msg-bubble {
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(23, 22, 19, 0.12);
+  border-bottom-left-radius: 4px;
+  color: #2a2a2a;
+  box-shadow: 4px 4px 0 rgba(23, 22, 19, 0.04);
+}
+.vuln-chat__msg--user .vuln-chat__msg-bubble {
+  background: rgba(36, 95, 159, 0.12);
+  border: 1px solid rgba(36, 95, 159, 0.3);
+  border-bottom-right-radius: 4px;
+  color: #1a3a66;
+  box-shadow: -4px 4px 0 rgba(36, 95, 159, 0.06);
+}
+.vuln-chat__msg--error .vuln-chat__msg-bubble {
+  background: rgba(185, 28, 28, 0.08);
+  border-color: rgba(185, 28, 28, 0.32);
+  color: #b91c1c;
+}
+
+.vuln-chat__msg-plain {
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.vuln-chat__msg-md {
+  font-family: Georgia, "Times New Roman", serif;
+}
+.vuln-chat__msg-md p {
+  margin: 0 0 6px 0;
+}
+.vuln-chat__msg-md p:last-child {
+  margin-bottom: 0;
+}
+.vuln-chat__msg-md h1,
+.vuln-chat__msg-md h2,
+.vuln-chat__msg-md h3 {
+  font-size: 13px;
+  font-weight: 700;
+  margin: 0 0 6px 0;
+  color: #171613;
+  letter-spacing: 0.01em;
+}
+.vuln-chat__msg-md ul,
+.vuln-chat__msg-md ol {
+  margin: 4px 0 8px 0;
+  padding-left: 18px;
+}
+.vuln-chat__msg-md li {
+  margin-bottom: 2px;
+}
+.vuln-chat__msg-md code {
+  font-family: "JetBrains Mono", "Fira Code", Menlo, monospace;
+  font-size: 11.5px;
+  background: rgba(23, 22, 19, 0.07);
+  border: 1px solid rgba(23, 22, 19, 0.12);
+  padding: 1px 4px;
+  border-radius: 4px;
+  color: #1f1f1f;
+}
+.vuln-chat__msg-md pre {
+  background: #0f1218;
+  color: #e4e7ef;
+  padding: 10px 12px;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-size: 11.5px;
+  margin: 6px 0;
+}
+.vuln-chat__msg-md pre code {
+  background: transparent;
+  border: none;
+  color: inherit;
+  padding: 0;
+}
+.vuln-chat__msg-md strong {
+  color: #171613;
+  font-weight: 700;
+}
+.vuln-chat__msg-md em {
+  color: #5a5a5a;
+}
+
+.vuln-chat__cursor {
+  display: inline-block;
+  width: 6px;
+  height: 12px;
+  margin-left: 2px;
+  background: #245f9f;
+  vertical-align: middle;
+  animation: vuln-chat-blink 1s steps(2, start) infinite;
+}
+@keyframes vuln-chat-blink {
+  to { visibility: hidden; }
+}
+
+.vuln-chat__composer {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  padding: 10px 12px;
+  border-top: 1px solid rgba(23, 22, 19, 0.1);
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.vuln-chat__input {
+  flex: 1;
+  resize: none;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(23, 22, 19, 0.16);
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #171613;
+  max-height: 140px;
+  min-height: 36px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.vuln-chat__input::placeholder {
+  color: #8a8174;
+}
+.vuln-chat__input:focus {
+  border-color: rgba(36, 95, 159, 0.5);
+  box-shadow: 0 0 0 3px rgba(36, 95, 159, 0.12);
+}
+
+.vuln-chat__send {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  border: 1px solid rgba(36, 95, 159, 0.45);
+  background: rgba(36, 95, 159, 0.95);
+  color: #fffdf8;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  box-shadow: 4px 4px 0 rgba(36, 95, 159, 0.18);
+}
+.vuln-chat__send:hover:not(:disabled) {
+  transform: translate(-1px, -1px);
+  box-shadow: 5px 5px 0 rgba(36, 95, 159, 0.22);
+}
+.vuln-chat__send:active:not(:disabled) {
+  transform: translate(0, 0);
+  box-shadow: 2px 2px 0 rgba(36, 95, 159, 0.16);
+}
+.vuln-chat__send:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.vuln-chat__send--stop {
+  background: rgba(185, 28, 28, 0.92);
+  border-color: rgba(185, 28, 28, 0.5);
+  box-shadow: 4px 4px 0 rgba(185, 28, 28, 0.18);
+}
+
+/* ============================================================
+ * Call Graph (CfgGraph) — editorial cartograph on warm paper.
+ * The whole subtree is scoped under .analysis-callgraph and the
+ * outer .analysis-shell light theme so we override ReactFlow's
+ * dark defaults precisely without leaking into other surfaces.
+ * ============================================================ */
+@keyframes analysis-cg-flow {
+  to { stroke-dashoffset: -28; }
+}
+@keyframes analysis-cg-glow {
+  0%, 100% {
+    box-shadow:
+      6px 7px 0 rgba(23, 22, 19, 0.10),
+      0 0 0 3px color-mix(in srgb, var(--accent, #245f9f) 28%, transparent),
+      0 0 18px -2px color-mix(in srgb, var(--accent, #245f9f) 38%, transparent);
+  }
+  50% {
+    box-shadow:
+      6px 7px 0 rgba(23, 22, 19, 0.12),
+      0 0 0 4px color-mix(in srgb, var(--accent, #245f9f) 36%, transparent),
+      0 0 28px -2px color-mix(in srgb, var(--accent, #245f9f) 55%, transparent);
+  }
+}
+
+/* Outer wrap: paper canvas with subtle vignette + faint ledger grid */
+.analysis-shell .analysis-callgraph {
+  border: 1px solid var(--light-line) !important;
+  border-radius: 14px !important;
+  background:
+    radial-gradient(ellipse at 50% 30%, rgba(255, 253, 245, 0.92) 0%, transparent 65%),
+    radial-gradient(ellipse at 100% 100%, rgba(36, 95, 159, 0.05) 0%, transparent 55%),
+    radial-gradient(ellipse at 0% 100%, rgba(47, 125, 82, 0.04) 0%, transparent 55%),
+    linear-gradient(180deg, #fbf8ed 0%, #f3ecdb 100%) !important;
+  box-shadow: 10px 12px 0 rgba(23, 22, 19, 0.055) !important;
+}
+
+.analysis-shell .analysis-callgraph .react-flow {
+  background: transparent !important;
+}
+
+/* Soft paper-grain overlay on the canvas */
+.analysis-shell .analysis-callgraph::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background:
+    radial-gradient(ellipse 120% 70% at 50% -10%, rgba(255, 253, 245, 0.55), transparent 70%),
+    radial-gradient(ellipse 110% 70% at 50% 110%, rgba(23, 22, 19, 0.06), transparent 65%);
+  mix-blend-mode: multiply;
+  opacity: 0.7;
+}
+
+/* ----------------------------------------------------------------
+ * CGNODE — manuscript card
+ * ---------------------------------------------------------------- */
+.analysis-cgnode {
+  position: relative;
+  font-family: "JetBrains Mono", "Fira Code", Menlo, monospace;
+  transition: transform 200ms ease, opacity 200ms ease;
+  --accent: #245f9f;
+}
+.analysis-cgnode[data-state="faded"] {
+  opacity: 0.32;
+}
+.analysis-cgnode[data-state="selected"] {
+  z-index: 10;
+}
+.analysis-cgnode:hover {
+  transform: translate(-2px, -2px);
+  z-index: 9;
+}
+
+.analysis-cgnode__handle {
+  width: 7px !important;
+  height: 7px !important;
+  background: var(--accent) !important;
+  border: 1.5px solid #fffdf8 !important;
+  opacity: 0.9;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+.analysis-cgnode__card {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, #fffefa 0%, #faf6ea 100%),
+    color-mix(in srgb, var(--accent) 6%, #fffdf8);
+  border: 1px solid color-mix(in srgb, var(--accent) 32%, rgba(23, 22, 19, 0.14));
+  box-shadow:
+    6px 7px 0 rgba(23, 22, 19, 0.10),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  transition: box-shadow 200ms ease, border-color 200ms ease,
+    background 200ms ease, transform 200ms ease;
+}
+.analysis-cgnode:hover .analysis-cgnode__card {
+  border-color: color-mix(in srgb, var(--accent) 55%, rgba(23, 22, 19, 0.16));
+  box-shadow:
+    9px 10px 0 rgba(23, 22, 19, 0.13),
+    0 0 0 1px color-mix(in srgb, var(--accent) 14%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+.analysis-cgnode[data-state="highlighted"] .analysis-cgnode__card {
+  border-color: color-mix(in srgb, var(--accent) 65%, rgba(23, 22, 19, 0.16));
+  box-shadow:
+    7px 8px 0 rgba(23, 22, 19, 0.12),
+    0 0 0 2px color-mix(in srgb, var(--accent) 18%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+.analysis-cgnode[data-state="selected"] .analysis-cgnode__card {
+  border-color: var(--accent);
+  background:
+    linear-gradient(180deg, #fffefa 0%, color-mix(in srgb, var(--accent) 8%, #fffdf8) 100%);
+  animation: analysis-cg-glow 2.6s ease-in-out infinite;
+}
+
+/* Top stripe — manuscript ribbon */
+.analysis-cgnode__stripe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background:
+    linear-gradient(90deg,
+      var(--accent) 0%,
+      color-mix(in srgb, var(--accent) 65%, #fffdf8) 100%);
+  opacity: 0.95;
+}
+
+/* Left rail — accent column */
+.analysis-cgnode__rail {
+  position: absolute;
+  top: 4px;
+  bottom: 0;
+  left: 0;
+  width: 3px;
+  background: var(--accent);
+  opacity: 0.85;
+}
+
+/* Modifier nodes get a dashed left rail to look distinct */
+.analysis-cgnode[data-modifier="true"] .analysis-cgnode__rail {
+  background: repeating-linear-gradient(
+    180deg,
+    var(--accent) 0,
+    var(--accent) 4px,
+    transparent 4px,
+    transparent 7px
+  );
+  opacity: 0.95;
+}
+.analysis-cgnode[data-modifier="true"] .analysis-cgnode__card {
+  background:
+    linear-gradient(180deg, #fffaf0 0%, #fbf2dd 100%),
+    color-mix(in srgb, var(--accent) 6%, #fffdf8);
+}
+
+.analysis-cgnode__body {
+  height: 100%;
+  width: 100%;
+  padding: 8px 10px 8px 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
+  min-width: 0;
+}
+
+.analysis-cgnode__meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.analysis-cgnode__contract {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--accent) 80%, #1a1a1a);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
+}
+
+.analysis-cgnode__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  flex-shrink: 0;
+  padding: 1px 6px 1px 4px;
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  border-radius: 999px;
+  color: #7a4b15;
+  background: rgba(180, 110, 30, 0.14);
+  border: 1px solid rgba(180, 110, 30, 0.38);
+}
+.analysis-cgnode__badge-glyph {
+  font-size: 9px;
+  line-height: 1;
+  color: #a4541a;
+  transform: translateY(-0.5px);
+}
+
+.analysis-cgnode__name {
+  font-family: "JetBrains Mono", "Fira Code", Menlo, monospace;
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: #14130f;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ----------------------------------------------------------------
+ * Toolbar (top-left) — paper cartouche with offset shadow
+ * ---------------------------------------------------------------- */
+.analysis-cgtoolbar {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 12;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 6px 5px 10px;
+  border-radius: 12px;
+  border: 1px solid var(--light-line);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.78));
+  box-shadow: 6px 7px 0 rgba(23, 22, 19, 0.07);
+  backdrop-filter: blur(8px);
+  font-family: "JetBrains Mono", "Fira Code", Menlo, monospace;
+}
+.analysis-cgtoolbar__label {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--light-faint);
+  margin-right: 4px;
+}
+.analysis-cgtoolbar__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 9px;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--light-muted);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+.analysis-cgtoolbar__btn:hover {
+  color: var(--light-blue);
+  background: rgba(36, 95, 159, 0.06);
+}
+.analysis-cgtoolbar__btn[data-active="true"] {
+  color: var(--light-blue);
+  background: rgba(36, 95, 159, 0.12);
+  border-color: rgba(36, 95, 159, 0.32);
+  box-shadow: inset 0 -2px 0 rgba(36, 95, 159, 0.45);
+}
+.analysis-cgtoolbar__icon {
+  font-size: 11px;
+  font-weight: 800;
+  opacity: 0.9;
+}
+
+/* ----------------------------------------------------------------
+ * Stats banner (top-right)
+ * ---------------------------------------------------------------- */
+.analysis-cgstats {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 12;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--light-line);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.78));
+  box-shadow: 6px 7px 0 rgba(23, 22, 19, 0.07);
+  backdrop-filter: blur(8px);
+  font-family: "JetBrains Mono", "Fira Code", Menlo, monospace;
+}
+.analysis-cgstats__row {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+}
+.analysis-cgstats__num {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--light-ink);
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+}
+.analysis-cgstats__lbl {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--light-faint);
+}
+.analysis-cgstats__sep {
+  width: 1px;
+  height: 14px;
+  background: var(--light-line);
+}
+
+/* ----------------------------------------------------------------
+ * Loading veil + empty state
+ * ---------------------------------------------------------------- */
+.analysis-cgveil {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background:
+    radial-gradient(ellipse at center, rgba(255, 253, 245, 0.85), rgba(247, 243, 232, 0.6));
+  backdrop-filter: blur(2px);
+  pointer-events: none;
+}
+.analysis-cgveil__txt {
+  font-family: "JetBrains Mono", "Fira Code", Menlo, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--light-muted);
+}
+.analysis-cgempty {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: var(--light-faint);
+}
+.analysis-cgempty__txt {
+  font-family: "JetBrains Mono", "Fira Code", Menlo, monospace;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: var(--light-muted);
+}
+
+/* ----------------------------------------------------------------
+ * Legend (bottom-left)
+ * ---------------------------------------------------------------- */
+.analysis-cglegend {
+  position: absolute;
+  bottom: 14px;
+  left: 14px;
+  z-index: 12;
+  min-width: 188px;
+  max-width: 240px;
+  border-radius: 12px;
+  border: 1px solid var(--light-line);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(255, 253, 245, 0.82));
+  box-shadow: 7px 9px 0 rgba(23, 22, 19, 0.06);
+  backdrop-filter: blur(8px);
+  font-family: "JetBrains Mono", "Fira Code", Menlo, monospace;
+  overflow: hidden;
+  animation: analysis-fade-in 0.3s ease-out both;
+}
+.analysis-cglegend__head {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  border-bottom: 1px solid transparent;
+  transition: background 0.18s ease, border-color 0.18s ease;
+}
+.analysis-cglegend[data-open="true"] .analysis-cglegend__head {
+  border-bottom-color: var(--light-line);
+}
+.analysis-cglegend__head:hover {
+  background: rgba(36, 95, 159, 0.05);
+}
+.analysis-cglegend__title {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--light-muted);
+  flex: 1;
+}
+.analysis-cglegend__count {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--light-ink);
+  font-variant-numeric: tabular-nums;
+  padding: 1px 6px;
+  border-radius: 999px;
+  border: 1px solid var(--light-line);
+  background: rgba(255, 255, 255, 0.7);
+}
+.analysis-cglegend__caret {
+  font-size: 10px;
+  color: var(--light-faint);
+  margin-left: 2px;
+}
+.analysis-cglegend__list {
+  list-style: none;
+  padding: 6px 8px 8px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 220px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(23, 22, 19, 0.18) transparent;
+}
+.analysis-cglegend__list::-webkit-scrollbar { width: 6px; }
+.analysis-cglegend__list::-webkit-scrollbar-thumb {
+  background: rgba(23, 22, 19, 0.16);
+  border-radius: 999px;
+}
+.analysis-cglegend__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  font-size: 11px;
+  color: var(--light-ink);
+  transition: background 0.15s ease;
+}
+.analysis-cglegend__row:hover {
+  background: rgba(36, 95, 159, 0.06);
+}
+.analysis-cglegend__swatch {
+  width: 11px;
+  height: 11px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.18),
+    0 1px 0 rgba(255, 255, 255, 0.4);
+}
+.analysis-cglegend__name {
+  flex: 1;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: 0.01em;
+}
+.analysis-cglegend__num {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--light-faint);
+  font-variant-numeric: tabular-nums;
+}
+.analysis-cglegend__more {
+  padding: 4px 6px;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--light-faint);
+  border-top: 1px dashed var(--light-line);
+  margin-top: 2px;
+  text-align: center;
+}
+
+/* ----------------------------------------------------------------
+ * ReactFlow controls + minimap (light theme override, scoped)
+ * ---------------------------------------------------------------- */
+.analysis-shell .analysis-callgraph .react-flow__controls,
+.analysis-shell .analysis-callgraph .react-flow__minimap {
+  border: 1px solid var(--light-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(255, 253, 245, 0.84)) !important;
+  box-shadow: 6px 8px 0 rgba(23, 22, 19, 0.06) !important;
+  border-radius: 10px !important;
+  overflow: hidden !important;
+  backdrop-filter: blur(8px);
+}
+.analysis-shell .analysis-callgraph .react-flow__controls {
+  bottom: 14px !important;
+  right: 14px !important;
+  left: auto !important;
+}
+.analysis-shell .analysis-callgraph .react-flow__controls-button {
+  background: transparent !important;
+  border: none !important;
+  border-bottom: 1px solid var(--light-line) !important;
+  color: var(--light-muted) !important;
+  width: 26px !important;
+  height: 26px !important;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+.analysis-shell .analysis-callgraph .react-flow__controls-button:last-child {
+  border-bottom: none !important;
+}
+.analysis-shell .analysis-callgraph .react-flow__controls-button:hover {
+  background: rgba(36, 95, 159, 0.1) !important;
+  color: var(--light-blue) !important;
+}
+.analysis-shell .analysis-callgraph .react-flow__controls-button svg {
+  fill: currentColor;
+  max-width: 14px;
+  max-height: 14px;
+}
+.analysis-shell .analysis-callgraph .react-flow__minimap {
+  margin: 0 !important;
+  bottom: 14px !important;
+  right: 56px !important;
+  width: 158px !important;
+  height: 110px !important;
+}
+.analysis-shell .analysis-callgraph .react-flow__minimap svg {
+  border-radius: 8px;
+}
+
+/* Edges — soften default line + animate active path with flowing dash */
+.analysis-shell .analysis-callgraph .react-flow__edge-path {
+  transition: stroke 200ms ease, stroke-width 200ms ease, opacity 200ms ease;
+}
+.analysis-shell .analysis-callgraph .react-flow__edge.animated .react-flow__edge-path {
+  stroke-dasharray: 6 6;
+  animation: analysis-cg-flow 1.4s linear infinite;
+}
+.analysis-shell .analysis-callgraph .react-flow__arrowhead {
+  transition: fill 200ms ease;
+}
+

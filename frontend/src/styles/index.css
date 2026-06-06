@@ -2214,6 +2214,103 @@ body {
   color: var(--light-green) !important;
 }
 
+/* ----------------------------------------------------------------
+ * Severity color overrides for light theme
+ * Tailwind "-200/-300" tints become invisible on warm white paper.
+ * Bump them to the matching "-700" hue so vulnerability badges,
+ * pills and inline accents read clearly on the bright surface.
+ * ---------------------------------------------------------------- */
+.retro-page .text-red-200,
+.retro-page .text-red-300,
+.audit-workbench .text-red-200,
+.audit-workbench .text-red-300 {
+  color: #b91c1c !important; /* red-700 */
+}
+
+.retro-page .text-amber-200,
+.retro-page .text-amber-300,
+.audit-workbench .text-amber-200,
+.audit-workbench .text-amber-300 {
+  color: #b45309 !important; /* amber-700 */
+}
+
+.retro-page .text-blue-200,
+.retro-page .text-blue-300,
+.audit-workbench .text-blue-200,
+.audit-workbench .text-blue-300 {
+  color: #1d4ed8 !important; /* blue-700 */
+}
+
+.retro-page .text-indigo-100,
+.retro-page .text-indigo-200,
+.retro-page .text-indigo-300,
+.audit-workbench .text-indigo-100,
+.audit-workbench .text-indigo-200,
+.audit-workbench .text-indigo-300 {
+  color: #4338ca !important; /* indigo-700 */
+}
+
+.retro-page .text-emerald-200,
+.audit-workbench .text-emerald-200 {
+  color: #047857 !important; /* emerald-700 */
+}
+
+.retro-page .text-green-200,
+.retro-page .text-green-300,
+.audit-workbench .text-green-200,
+.audit-workbench .text-green-300 {
+  color: #15803d !important; /* green-700 */
+}
+
+.retro-page .text-cyan-200,
+.retro-page .text-cyan-300,
+.audit-workbench .text-cyan-200 {
+  color: #0e7490 !important; /* cyan-700 */
+}
+
+/* ----------------------------------------------------------------
+ * Restore dark-popover text inside ToolsPopover.
+ * The light theme above force-darkens .text-white / .text-zinc-* via
+ * !important. ToolsPopover renders a fixed dark panel (#0a0e1a) that
+ * still needs light text, so we re-light it here while keeping the
+ * rest of the workbench in the light scheme.
+ * ---------------------------------------------------------------- */
+.audit-workbench .tools-popover .text-white,
+.retro-page .tools-popover .text-white {
+  color: #ffffff !important;
+}
+
+.audit-workbench .tools-popover .text-zinc-100,
+.audit-workbench .tools-popover .text-zinc-200,
+.audit-workbench .tools-popover .text-zinc-300,
+.retro-page .tools-popover .text-zinc-100,
+.retro-page .tools-popover .text-zinc-200,
+.retro-page .tools-popover .text-zinc-300 {
+  color: #e4e4e7 !important; /* zinc-200 */
+}
+
+.audit-workbench .tools-popover .text-zinc-400,
+.audit-workbench .tools-popover .text-zinc-500,
+.audit-workbench .tools-popover .text-zinc-600,
+.retro-page .tools-popover .text-zinc-400,
+.retro-page .tools-popover .text-zinc-500,
+.retro-page .tools-popover .text-zinc-600 {
+  color: #a1a1aa !important; /* zinc-400 */
+}
+
+.audit-workbench .tools-popover .text-indigo-300,
+.audit-workbench .tools-popover .text-indigo-300\/80,
+.retro-page .tools-popover .text-indigo-300 {
+  color: #a5b4fc !important; /* indigo-300 */
+}
+
+.audit-workbench .tools-popover .text-emerald-300,
+.audit-workbench .tools-popover .text-emerald-400,
+.retro-page .tools-popover .text-emerald-300,
+.retro-page .tools-popover .text-emerald-400 {
+  color: #6ee7b7 !important; /* emerald-300 */
+}
+
 .audit-workbench button {
   font-family: Georgia, "Times New Roman", serif !important;
 }

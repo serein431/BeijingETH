@@ -21,15 +21,15 @@ interface Token {
 }
 
 const TOKEN_CLASS: Record<TokenKind, string> = {
-  pass: "text-green-400 font-bold",
-  fail: "text-red-400 font-bold",
-  compile: "text-blue-400",
-  error: "text-red-400",
-  vuln: "text-red-400 font-bold",
-  separator: "text-yellow-400/70",
-  filepath: "text-indigo-300",
-  number: "text-cyan-400",
-  default: "text-green-300/90",
+  pass: "text-green-300 font-bold",
+  fail: "text-red-300 font-bold",
+  compile: "text-blue-300",
+  error: "text-red-300",
+  vuln: "text-red-300 font-bold",
+  separator: "text-yellow-300",
+  filepath: "text-indigo-200",
+  number: "text-cyan-300",
+  default: "text-green-200",
 };
 
 const SCOPED_STYLES = `
@@ -86,9 +86,9 @@ const SCOPED_STYLES = `
 .forge-gutter {
   user-select: none;
   text-align: right;
-  color: rgba(113, 113, 122, 0.6);
+  color: rgba(161, 161, 170, 0.95);
   font-variant-numeric: tabular-nums;
-  border-right: 1px solid rgba(255, 255, 255, 0.04);
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
   padding-right: 0.75rem;
 }
 `;
@@ -288,10 +288,10 @@ export default function ForgeOutput({ output }: ForgeOutputProps) {
       <>
         <style>{SCOPED_STYLES}</style>
         <div className="forge-shell flex flex-col items-center justify-center gap-3 rounded-xl border border-white/[0.06] bg-white/[0.02] p-12 text-center backdrop-blur-sm">
-          <div className="flex h-12 w-12 items-center justify-center rounded-lg border border-white/[0.06] bg-black/40 text-zinc-500">
+          <div className="flex h-12 w-12 items-center justify-center rounded-lg border border-white/[0.1] bg-black/40 text-zinc-300">
             <TerminalIcon />
           </div>
-          <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-zinc-400">
+          <p className="font-mono text-[11px] font-bold uppercase tracking-[0.22em] text-zinc-200">
             No execution output available
           </p>
         </div>
@@ -312,7 +312,7 @@ export default function ForgeOutput({ output }: ForgeOutputProps) {
               <span className="h-2.5 w-2.5 rounded-full bg-amber-400/70" />
               <span className="h-2.5 w-2.5 rounded-full bg-emerald-500/70" />
             </div>
-            <div className="flex items-center gap-2 text-zinc-200">
+            <div className="flex items-center gap-2 text-white">
               <TerminalIcon />
               <span className="text-[12px] font-bold tracking-tight">
                 Forge Test Output
@@ -325,8 +325,8 @@ export default function ForgeOutput({ output }: ForgeOutputProps) {
             <span
               className={`inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-[0.18em] ${
                 status === "PASSED"
-                  ? "border-green-500/30 bg-green-500/15 text-green-400"
-                  : "border-red-500/30 bg-red-500/15 text-red-400"
+                  ? "border-green-400/50 bg-green-500/20 text-green-200"
+                  : "border-red-400/50 bg-red-500/20 text-red-200"
               }`}
             >
               <span
@@ -341,19 +341,19 @@ export default function ForgeOutput({ output }: ForgeOutputProps) {
           {/* Right: gas + copy */}
           <div className="ml-auto flex items-center gap-2">
             {gas && (
-              <span className="inline-flex items-center gap-1.5 rounded-md border border-cyan-500/20 bg-cyan-500/10 px-2 py-0.5 font-mono text-[10.5px] text-cyan-300">
+              <span className="inline-flex items-center gap-1.5 rounded-md border border-cyan-400/40 bg-cyan-500/15 px-2 py-0.5 font-mono text-[10.5px] text-cyan-200">
                 <GasIcon />
-                <span className="opacity-60">gas</span>
-                <span className="font-semibold tabular-nums">{gas}</span>
+                <span className="opacity-90 font-semibold">gas</span>
+                <span className="font-bold tabular-nums">{gas}</span>
               </span>
             )}
             <button
               type="button"
               onClick={handleCopy}
-              className={`inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 font-mono text-[11px] transition-all duration-200 ${
+              className={`inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 font-mono text-[11px] font-semibold transition-all duration-200 ${
                 copied
-                  ? "border-emerald-400/30 bg-emerald-500/10 text-emerald-300"
-                  : "border-white/[0.08] bg-white/[0.02] text-zinc-400 hover:border-white/[0.16] hover:bg-white/[0.06] hover:text-zinc-100"
+                  ? "border-emerald-400/50 bg-emerald-500/20 text-emerald-200"
+                  : "border-white/[0.12] bg-white/[0.04] text-zinc-200 hover:border-white/[0.2] hover:bg-white/[0.08] hover:text-white"
               }`}
             >
               <CopyIcon copied={copied} />

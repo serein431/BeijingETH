@@ -1,9 +1,13 @@
 import { useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
+
+type ToolsPhase = "parse" | "slither" | "poc_gen" | "forge_test";
 
 interface ToolsPopoverProps {
-  phase: "parse" | "slither";
+  phase: ToolsPhase;
   position: { x: number; y: number };
   onClose: () => void;
+  testOutput?: string | null;
 }
 
 type ToolStatus = "active" | "soon";
@@ -22,7 +26,7 @@ interface ToolsBundle {
   tools: ToolEntry[];
 }
 
-const TOOLS_CONFIG: Record<"parse" | "slither", ToolsBundle> = {
+const TOOLS_CONFIG: Record<ToolsPhase, ToolsBundle> = {
   parse: {
     title: "Structure Analysis",
     subtitle: "Parsing & Code Structure",
@@ -91,12 +95,75 @@ const TOOLS_CONFIG: Record<"parse" | "slither", ToolsBundle> = {
       },
     ],
   },
+  poc_gen: {
+    title: "PoC Generation Methods",
+    subtitle: "Exploit Synthesis Strategies",
+    tag: "STAGE / 04",
+    tools: [
+      {
+        name: "LLM Code Generator",
+        desc: "AI-powered exploit code generation",
+        status: "active",
+        glyph: "LLM",
+      },
+      {
+        name: "Template-based",
+        desc: "Pre-built exploit templates",
+        status: "active",
+        glyph: "TPL",
+      },
+      {
+        name: "Symbolic Execution",
+        desc: "Automated path-based PoC",
+        status: "soon",
+        glyph: "SYM",
+      },
+      {
+        name: "Fuzzing-guided",
+        desc: "Coverage-guided PoC generation",
+        status: "soon",
+        glyph: "FUZ",
+      },
+    ],
+  },
+  forge_test: {
+    title: "Test & Verification Tools",
+    subtitle: "PoC Execution & Validation",
+    tag: "STAGE / 05",
+    tools: [
+      {
+        name: "Foundry (Forge)",
+        desc: "Smart contract testing framework",
+        status: "active",
+        glyph: "FRG",
+      },
+      {
+        name: "Auto-Repair Loop",
+        desc: "Iterative PoC fix (up to 3 rounds)",
+        status: "active",
+        glyph: "FIX",
+      },
+      {
+        name: "Hardhat",
+        desc: "Alternative test framework",
+        status: "soon",
+        glyph: "HHT",
+      },
+      {
+        name: "Tenderly Simulation",
+        desc: "Fork-based transaction simulation",
+        status: "soon",
+        glyph: "TND",
+      },
+    ],
+  },
 };
 
 export default function ToolsPopover({
   phase,
   position,
   onClose,
+  testOutput,
 }: ToolsPopoverProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const bundle = TOOLS_CONFIG[phase];
@@ -133,23 +200,27 @@ export default function ToolsPopover({
   const activeCount = bundle.tools.filter((t) => t.status === "active").length;
   const soonCount = bundle.tools.length - activeCount;
 
-  return (
+  if (typeof document === "undefined") return null;
+
+  const popoverNode = (
     <div
       ref={panelRef}
       role="dialog"
       aria-label={bundle.title}
       onClick={(e) => e.stopPropagation()}
+      onMouseDown={(e) => e.stopPropagation()}
       style={{
         position: "fixed",
         left: `${position.x}px`,
         top: `${clampedTop}px`,
         width: "280px",
+        zIndex: 9999,
       }}
-      className="z-[120] tools-popover"
+      className="z-[9999] tools-popover"
     >
       {/* Connector tick that ties the popover back to the originating PhaseNode */}
-      <div className="absolute -left-3 top-6 flex items-center pointer-events-none">
-        <div className="h-px w-3 bg-gradient-to-r from-transparent via-indigo-400/50 to-indigo-400/80" />
+      <div className="absolute -right-3 top-6 flex items-center flex-row-reverse pointer-events-none">
+        <div className="h-px w-3 bg-gradient-to-l from-transparent via-indigo-400/50 to-indigo-400/80" />
         <div className="w-1.5 h-1.5 rounded-full bg-indigo-400 shadow-[0_0_8px_rgba(129,140,248,0.8)]" />
       </div>
 
@@ -194,6 +265,24 @@ export default function ToolsPopover({
           ))}
         </div>
 
+        {/* Optional: forge test output preview */}
+        {phase === "forge_test" && testOutput && (
+          <div className="relative border-t border-white/[0.06] px-4 py-3 bg-black/30">
+            <div className="flex items-center justify-between mb-1.5">
+              <span className="text-[9px] font-mono tracking-[0.2em] text-emerald-300/80">
+                FORGE OUTPUT
+              </span>
+              <span className="text-[9px] font-mono text-zinc-600 tracking-wider">
+                {testOutput.length > 500 ? "PREVIEW · 500" : `${testOutput.length} CH`}
+              </span>
+            </div>
+            <pre className="max-h-[150px] overflow-y-auto bg-black/80 text-green-300 font-mono text-xs leading-relaxed p-2 rounded border border-emerald-500/10 whitespace-pre-wrap break-words">
+              {testOutput.slice(0, 500)}
+              {testOutput.length > 500 ? "\n…" : ""}
+            </pre>
+          </div>
+        )}
+
         {/* Footer */}
         <div className="relative border-t border-white/[0.06] px-4 py-2.5 flex items-center justify-between bg-black/20">
           <span className="text-[10px] text-zinc-600 italic font-light tracking-wide">
@@ -208,12 +297,12 @@ export default function ToolsPopover({
       <style>{`
         .tools-popover {
           animation: toolsPopIn 200ms cubic-bezier(0.16, 1, 0.3, 1) both;
-          transform-origin: left top;
+          transform-origin: right top;
         }
         @keyframes toolsPopIn {
           from {
             opacity: 0;
-            transform: scale(0.95) translateX(-4px);
+            transform: scale(0.95) translateX(4px);
           }
           to {
             opacity: 1;
@@ -226,7 +315,7 @@ export default function ToolsPopover({
         @keyframes toolRowIn {
           from {
             opacity: 0;
-            transform: translateX(-6px);
+            transform: translateX(6px);
           }
           to {
             opacity: 1;
@@ -248,6 +337,8 @@ export default function ToolsPopover({
       `}</style>
     </div>
   );
+
+  return createPortal(popoverNode, document.body);
 }
 
 function ToolRow({ tool, index }: { tool: ToolEntry; index: number }) {

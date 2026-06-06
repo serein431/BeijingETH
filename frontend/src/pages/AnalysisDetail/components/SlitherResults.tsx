@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import type { SlitherVulnerability, VulnLocation } from "../types";
+import VulnChat from "./VulnChat";
 
 interface SlitherResultsProps {
   vulnerabilities: SlitherVulnerability[];
@@ -21,41 +22,41 @@ interface SeverityTokens {
 const SEVERITY_TOKENS: Record<Severity, SeverityTokens> = {
   High: {
     bar: "bg-red-500",
-    pill: "bg-red-500/20 text-red-400 border-red-500/30",
-    pillSoft: "bg-red-500/10 text-red-300/80 border-red-500/20",
+    pill: "bg-red-500/25 text-red-200 border-red-400/50",
+    pillSoft: "bg-red-500/15 text-red-200 border-red-400/40",
     glow: "shadow-[0_0_40px_-12px_rgba(239,68,68,0.45)]",
     dot: "bg-red-500",
-    text: "text-red-400",
+    text: "text-red-300",
     ring: "ring-red-500/30",
     letter: "H",
   },
   Medium: {
     bar: "bg-amber-500",
-    pill: "bg-amber-500/20 text-amber-400 border-amber-500/30",
-    pillSoft: "bg-amber-500/10 text-amber-300/80 border-amber-500/20",
+    pill: "bg-amber-500/25 text-amber-200 border-amber-400/50",
+    pillSoft: "bg-amber-500/15 text-amber-200 border-amber-400/40",
     glow: "shadow-[0_0_40px_-12px_rgba(245,158,11,0.4)]",
     dot: "bg-amber-500",
-    text: "text-amber-400",
+    text: "text-amber-300",
     ring: "ring-amber-500/30",
     letter: "M",
   },
   Low: {
     bar: "bg-blue-500",
-    pill: "bg-blue-500/20 text-blue-400 border-blue-500/30",
-    pillSoft: "bg-blue-500/10 text-blue-300/80 border-blue-500/20",
+    pill: "bg-blue-500/25 text-blue-200 border-blue-400/50",
+    pillSoft: "bg-blue-500/15 text-blue-200 border-blue-400/40",
     glow: "shadow-[0_0_40px_-12px_rgba(59,130,246,0.4)]",
     dot: "bg-blue-500",
-    text: "text-blue-400",
+    text: "text-blue-300",
     ring: "ring-blue-500/30",
     letter: "L",
   },
   Informational: {
     bar: "bg-zinc-500",
-    pill: "bg-zinc-500/20 text-zinc-400 border-zinc-500/30",
-    pillSoft: "bg-zinc-500/10 text-zinc-400/80 border-zinc-500/20",
+    pill: "bg-zinc-500/25 text-zinc-200 border-zinc-400/50",
+    pillSoft: "bg-zinc-500/15 text-zinc-200 border-zinc-400/40",
     glow: "shadow-[0_0_40px_-12px_rgba(113,113,122,0.35)]",
     dot: "bg-zinc-500",
-    text: "text-zinc-400",
+    text: "text-zinc-300",
     ring: "ring-zinc-500/30",
     letter: "I",
   },
@@ -198,7 +199,7 @@ function VulnerabilityCard({
             >
               {tokens.letter}
             </span>
-            <h3 className="font-mono text-sm font-semibold text-zinc-100 truncate tracking-tight">
+            <h3 className="font-mono text-sm font-bold text-white truncate tracking-tight">
               {vuln.check}
             </h3>
           </div>
@@ -223,7 +224,7 @@ function VulnerabilityCard({
         </header>
 
         {/* Description */}
-        <p className="mt-3 text-[13px] font-medium leading-relaxed text-zinc-200 whitespace-pre-wrap break-words">
+        <p className="mt-3 text-[13px] font-medium leading-relaxed text-zinc-100 whitespace-pre-wrap break-words">
           {vuln.description}
         </p>
 
@@ -234,7 +235,7 @@ function VulnerabilityCard({
               type="button"
               onClick={() => setOpen((o) => !o)}
               aria-expanded={open}
-              className="mt-4 inline-flex items-center gap-1.5 rounded-md border border-white/[0.06] bg-white/[0.02] px-2.5 py-1 text-[11px] font-semibold text-zinc-300 transition-all duration-200 hover:border-white/[0.14] hover:bg-white/[0.06] hover:text-zinc-100"
+              className="mt-4 inline-flex items-center gap-1.5 rounded-md border border-white/[0.1] bg-white/[0.04] px-2.5 py-1 text-[11px] font-semibold text-zinc-100 transition-all duration-200 hover:border-white/[0.2] hover:bg-white/[0.08] hover:text-white"
             >
               <ChevronIcon open={open} />
               {open
@@ -268,19 +269,19 @@ function LocationBlock({ location }: { location: VulnLocation }) {
   return (
     <div className="overflow-hidden rounded-lg border border-white/[0.06] bg-black/40">
       <div className="flex flex-wrap items-center gap-2 border-b border-white/[0.04] bg-white/[0.015] px-3 py-2">
-        <span className="inline-flex items-center gap-1.5 font-mono text-[11px] font-medium text-zinc-300">
+        <span className="inline-flex items-center gap-1.5 font-mono text-[11px] font-semibold text-zinc-200">
           <FileIcon />
-          <span className="font-semibold text-zinc-100">{fileLabel}</span>
-          <span className="text-zinc-500">·</span>
-          <span className="text-indigo-300 font-semibold tabular-nums">{lineLabel}</span>
+          <span className="font-bold text-white">{fileLabel}</span>
+          <span className="text-zinc-300">·</span>
+          <span className="text-indigo-200 font-bold tabular-nums">{lineLabel}</span>
         </span>
         {location.label && (
-          <span className="ml-auto truncate text-[11px] font-medium italic text-zinc-400">
+          <span className="ml-auto truncate text-[11px] font-semibold italic text-zinc-200">
             {location.label}
           </span>
         )}
       </div>
-      <pre className="m-0 max-h-72 overflow-auto bg-[#0a0e14] px-4 py-3 font-mono text-[12px] leading-relaxed text-zinc-200">
+      <pre className="m-0 max-h-72 overflow-auto bg-[#0a0e14] px-4 py-3 font-mono text-[12px] leading-relaxed text-zinc-100">
         <code>{location.contract_content}</code>
       </pre>
     </div>
@@ -317,10 +318,10 @@ export default function SlitherResults({
             </div>
           </div>
           <div>
-            <p className="text-sm font-bold text-emerald-300">
+            <p className="text-sm font-bold text-emerald-200">
               No vulnerabilities detected
             </p>
-            <p className="mt-1 font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-400">
+            <p className="mt-1 font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-zinc-200">
               static analysis · clean
             </p>
           </div>
@@ -330,12 +331,12 @@ export default function SlitherResults({
   }
 
   return (
-    <>
+    <div className="slither-layout flex flex-col gap-4 min-h-0 flex-1">
       <style>{SCOPED_STYLES}</style>
 
       {/* Top statistics bar — glass card */}
       <section
-        className="slither-stat relative overflow-hidden rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 backdrop-blur-sm"
+        className="slither-stat relative overflow-hidden rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 backdrop-blur-sm shrink-0"
         style={{ animationDelay: "0ms" }}
       >
         <div className="slither-grid-bg pointer-events-none absolute inset-0 opacity-40" />
@@ -343,14 +344,14 @@ export default function SlitherResults({
           {/* Total count */}
           <div className="flex items-end gap-3">
             <div className="flex flex-col">
-              <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.22em] text-zinc-400">
+              <span className="font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-zinc-200">
                 slither · static analysis
               </span>
               <div className="mt-1 flex items-baseline gap-2">
                 <span className="text-4xl font-bold tabular-nums text-white leading-none">
                   {total}
                 </span>
-                <span className="text-xs font-semibold text-zinc-300">
+                <span className="text-xs font-bold text-zinc-100">
                   vulnerabilities found
                 </span>
               </div>
@@ -388,12 +389,19 @@ export default function SlitherResults({
         </div>
       </section>
 
-      {/* Vulnerability cards */}
-      <div className="mt-4 flex flex-col gap-3">
-        {vulnerabilities.map((vuln, i) => (
-          <VulnerabilityCard key={`${vuln.check}-${i}`} vuln={vuln} index={i} />
-        ))}
+      {/* Split: AI Advisor (left ~40%) + Vulnerability cards (right ~60%) */}
+      <div className="slither-split flex gap-4 min-h-0 flex-1">
+        <div className="slither-split-chat shrink-0 min-h-0 flex flex-col">
+          <VulnChat vulnerabilities={vulnerabilities} />
+        </div>
+        <div className="slither-split-cards flex-1 min-w-0 min-h-0 overflow-y-auto pr-1 slither-cards-scroll">
+          <div className="flex flex-col gap-3">
+            {vulnerabilities.map((vuln, i) => (
+              <VulnerabilityCard key={`${vuln.check}-${i}`} vuln={vuln} index={i} />
+            ))}
+          </div>
+        </div>
       </div>
-    </>
+    </div>
   );
 }

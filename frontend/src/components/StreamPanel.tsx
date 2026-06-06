@@ -35,7 +35,7 @@ export default function StreamPanel({
             {t("stream.title")}
           </h2>
           {state.isRunning && (
-            <span className="flex items-center gap-2 text-xs text-zinc-400">
+            <span className="flex items-center gap-2 text-xs text-zinc-200 font-semibold">
               <svg
                 className="w-3.5 h-3.5 animate-spin text-indigo-400"
                 fill="none"
@@ -55,7 +55,7 @@ export default function StreamPanel({
                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                 />
               </svg>
-              <span className="bg-gradient-to-r from-zinc-300 to-zinc-500 bg-clip-text text-transparent animate-pulse">
+              <span className="bg-gradient-to-r from-zinc-100 to-zinc-300 bg-clip-text text-transparent animate-pulse">
                 {state.currentPhase
                   ? getPhaseLabel(
                       language,
@@ -81,7 +81,7 @@ export default function StreamPanel({
           {state.isRunning && (
             <button
               onClick={onStop}
-              className="text-xs text-zinc-400 hover:text-red-400 px-3 py-1.5 rounded-lg border border-white/[0.06] hover:border-red-500/30 transition-all"
+              className="text-xs text-zinc-200 font-semibold hover:text-red-300 px-3 py-1.5 rounded-lg border border-white/[0.1] hover:border-red-400/40 transition-all"
             >
               {t("stream.stop")}
             </button>
@@ -89,7 +89,7 @@ export default function StreamPanel({
           {!state.isRunning && state.streamText && (
             <button
               onClick={onReset}
-              className="text-xs text-zinc-400 hover:text-white px-3 py-1.5 rounded-lg border border-white/[0.06] hover:border-white/20 transition-all"
+              className="text-xs text-zinc-200 font-semibold hover:text-white px-3 py-1.5 rounded-lg border border-white/[0.1] hover:border-white/30 transition-all"
             >
               {t("stream.newAudit")}
             </button>
@@ -108,14 +108,14 @@ export default function StreamPanel({
                 >
                   <RiskBadge language={language} risk={f.risk} />
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-zinc-100">
+                    <p className="text-sm font-bold text-white">
                       {f.title}
                     </p>
-                    <p className="text-xs text-zinc-400 mt-0.5 line-clamp-2">
+                    <p className="text-xs text-zinc-200 mt-0.5 line-clamp-2">
                       {f.description}
                     </p>
                     {f.contract && (
-                      <span className="text-[10px] font-mono text-zinc-500 mt-1 inline-block">
+                      <span className="text-[10px] font-mono font-semibold text-zinc-300 mt-1 inline-block">
                         {f.contract}
                         {f.function ? `.${f.function}` : ""}
                       </span>
@@ -126,7 +126,7 @@ export default function StreamPanel({
             </div>
           )}
 
-          <div className="stream-text text-sm text-zinc-300 font-light leading-relaxed">
+          <div className="stream-text text-sm text-zinc-100 font-normal leading-relaxed">
             <Markdown>{translateStreamText(language, state.streamText)}</Markdown>
             {state.isRunning && (
               <span className="inline-block w-1.5 h-4 bg-white cursor-blink ml-0.5 align-middle shadow-[0_0_8px_rgba(255,255,255,0.6)]" />
@@ -134,8 +134,8 @@ export default function StreamPanel({
           </div>
 
           {!state.isRunning && !state.streamText && (
-            <div className="text-center text-zinc-600 py-20">
-              <p className="text-sm">{t("stream.waiting")}</p>
+            <div className="text-center text-zinc-300 py-20">
+              <p className="text-sm font-semibold">{t("stream.waiting")}</p>
             </div>
           )}
         </div>
@@ -146,14 +146,14 @@ export default function StreamPanel({
 
 function RiskBadge({ language, risk }: { language: Language; risk: string }) {
   const colors: Record<string, string> = {
-    High: "bg-red-500/15 text-red-400 border-red-500/20",
-    Critical: "bg-red-500/15 text-red-400 border-red-500/20",
-    Medium: "bg-amber-500/15 text-amber-400 border-amber-500/20",
-    Low: "bg-blue-500/15 text-blue-400 border-blue-500/20",
-    Informational: "bg-zinc-500/15 text-zinc-400 border-zinc-500/20",
+    High: "bg-red-500/25 text-red-200 border-red-400/40",
+    Critical: "bg-red-500/25 text-red-200 border-red-400/40",
+    Medium: "bg-amber-500/25 text-amber-200 border-amber-400/40",
+    Low: "bg-blue-500/25 text-blue-200 border-blue-400/40",
+    Informational: "bg-zinc-500/25 text-zinc-200 border-zinc-400/40",
   };
   const cls =
-    colors[risk] || "bg-zinc-500/15 text-zinc-400 border-zinc-500/20";
+    colors[risk] || "bg-zinc-500/25 text-zinc-200 border-zinc-400/40";
   const zhRisk: Record<string, string> = {
     Critical: "严重",
     High: "高危",
@@ -185,12 +185,12 @@ function VerdictBadge({
     <span
       className={`text-[10px] font-bold px-2.5 py-1 rounded-full ${
         isVulnerable
-          ? "bg-red-500/15 text-red-400"
+          ? "bg-red-500/25 text-red-200"
           : isFailed
-            ? "bg-zinc-500/15 text-zinc-400"
+            ? "bg-zinc-500/25 text-zinc-200"
             : isUnknown
-              ? "bg-cyan-500/15 text-cyan-300"
-              : "bg-emerald-500/15 text-emerald-400"
+              ? "bg-cyan-500/25 text-cyan-200"
+              : "bg-emerald-500/25 text-emerald-200"
       }`}
     >
       {isVulnerable
