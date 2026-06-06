@@ -1,0 +1,20 @@
+# Python: 3.12.13
+# Install with: pip3 install -r requirements.txt
+# External tool for real PoC execution: Foundry.
+# Install Foundry separately; it is not a pip package.
+# curl -L https://foundry.paradigm.xyz | bash
+# source ~/.bashrc
+# foundryup
+
+# HTTP backend
+fastapi==0.136.3
+uvicorn[standard]==0.49.0
+python-multipart==0.0.32
+
+# Request/response models and OpenAI-compatible LLM client
+pydantic==2.13.4
+openai==2.41.0
+
+# Solidity static analysis and compiler-version selection
+slither-analyzer==0.11.5
+solc-select==1.2.0
