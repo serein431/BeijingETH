@@ -1,14 +1,16 @@
 import { useCallback, useState } from "react";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import FlowPanel from "./components/FlowPanel";
 import Sidebar from "./components/Sidebar";
 import StreamPanel from "./components/StreamPanel";
 import UploadArea from "./components/UploadArea";
 import { useAuditStream } from "./hooks/useAuditStream";
+import AnalysisDetail from "./pages/AnalysisDetail";
 import type { AuditMode, Language } from "./types";
 
 const DEFAULT_REPLAY_CASE = "binamon-dos";
 
-export default function App() {
+function MainApp() {
   const { state, startExampleReplay, stop, reset } = useAuditStream();
   const [started, setStarted] = useState(false);
   const [language, setLanguage] = useState<Language>("en");
@@ -60,5 +62,16 @@ export default function App() {
         )}
       </main>
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<MainApp />} />
+        <Route path="/analysis" element={<AnalysisDetail />} />
+      </Routes>
+    </BrowserRouter>
   );
 }

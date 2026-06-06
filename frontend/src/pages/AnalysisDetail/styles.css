@@ -1,0 +1,552 @@
+/* Scoped styles for the AnalysisDetail page.
+ * All selectors use the .analysis- prefix (or are nested inside it)
+ * to avoid colliding with shared utilities. */
+
+/* ============================================================
+ * Keyframes
+ * ============================================================ */
+@keyframes analysis-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes analysis-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes analysis-fade-in-soft {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes analysis-slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes analysis-breathe {
+  0%,
+  100% {
+    box-shadow: inset 2px 0 0 rgba(129, 140, 248, 0.95),
+      0 0 0 0 rgba(99, 102, 241, 0);
+  }
+  50% {
+    box-shadow: inset 2px 0 0 rgba(165, 180, 252, 1),
+      0 0 14px -2px rgba(99, 102, 241, 0.4);
+  }
+}
+
+@keyframes analysis-node-pulse {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 0 rgba(99, 102, 241, 0));
+  }
+  50% {
+    filter: drop-shadow(0 0 12px rgba(165, 180, 252, 0.55));
+  }
+}
+
+@keyframes analysis-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* ============================================================
+ * Shell + ambient background
+ * ============================================================ */
+.analysis-shell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  background-color: #030303;
+  color: #d4d4d8;
+  overflow: hidden;
+  animation: analysis-fade-in-soft 0.5s ease-out both;
+}
+
+.analysis-shell::before,
+.analysis-shell::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  z-index: 0;
+}
+
+.analysis-shell::before {
+  top: -25%;
+  left: -10%;
+  width: 55%;
+  height: 65%;
+  background: radial-gradient(
+    closest-side,
+    rgba(99, 102, 241, 0.18),
+    transparent 70%
+  );
+  filter: blur(120px);
+}
+
+.analysis-shell::after {
+  bottom: -25%;
+  right: -10%;
+  width: 50%;
+  height: 60%;
+  background: radial-gradient(
+    closest-side,
+    rgba(16, 185, 129, 0.1),
+    transparent 70%
+  );
+  filter: blur(120px);
+}
+
+.analysis-body {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.analysis-main {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+}
+
+.analysis-header {
+  animation: analysis-fade-in 0.45s ease-out 0.05s both;
+}
+
+/* ============================================================
+ * Tabs
+ * ============================================================ */
+.analysis-tabs {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 12px;
+  backdrop-filter: blur(12px);
+}
+
+.analysis-tab {
+  position: relative;
+  padding: 6px 14px;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: #a1a1aa;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  transition: color 0.18s ease, background-color 0.2s ease,
+    border-color 0.2s ease, box-shadow 0.25s ease, transform 0.18s ease;
+}
+
+.analysis-tab:hover {
+  color: #e4e4e7;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.analysis-tab:active {
+  transform: scale(0.97);
+}
+
+.analysis-tab[data-active="true"] {
+  color: #c7d2fe;
+  background: rgba(99, 102, 241, 0.1);
+  border-color: rgba(99, 102, 241, 0.35);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 0 14px rgba(99, 102, 241, 0.18);
+}
+
+/* ============================================================
+ * Content area + cards
+ * ============================================================ */
+.analysis-content {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  padding: 16px;
+  gap: 16px;
+}
+
+.analysis-content > * {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  animation: analysis-fade-in 0.32s ease-out both;
+}
+
+.analysis-card {
+  flex: 1;
+  min-width: 0;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(20px);
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease,
+    transform 0.25s ease;
+}
+
+.analysis-card:hover {
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 12px 32px -22px rgba(99, 102, 241, 0.45);
+}
+
+/* ============================================================
+ * Empty / loader
+ * ============================================================ */
+.analysis-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: #71717a;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  animation: analysis-fade-in 0.3s ease-out both;
+}
+
+.analysis-empty-glyph {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #52525b;
+  font-family: var(--font-mono, monospace);
+  background: linear-gradient(
+    135deg,
+    rgba(99, 102, 241, 0.06),
+    transparent 60%
+  );
+}
+
+.analysis-loader {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-top-color: rgba(99, 102, 241, 0.9);
+  animation: analysis-spin 0.8s linear infinite;
+}
+
+/* ============================================================
+ * Sidebar (function list)
+ * ============================================================ */
+.analysis-sidebar {
+  position: relative;
+  transition: width 0.25s ease, transform 0.3s ease, opacity 0.25s ease;
+  will-change: width, transform;
+}
+
+.analysis-sidebar[data-collapsed="true"] {
+  width: 56px !important;
+}
+
+.analysis-sidebar[data-collapsed="true"] .analysis-sidebar-content {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.analysis-sidebar-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  transition: opacity 0.18s ease;
+}
+
+.analysis-sidebar-toggle {
+  position: absolute;
+  top: 14px;
+  right: -12px;
+  z-index: 5;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(13, 17, 23, 0.92);
+  color: #a1a1aa;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  transition: all 0.2s ease;
+}
+
+.analysis-sidebar-toggle:hover {
+  color: #c7d2fe;
+  border-color: rgba(99, 102, 241, 0.45);
+  background: rgba(30, 27, 75, 0.85);
+  box-shadow: 0 0 14px rgba(99, 102, 241, 0.3);
+}
+
+.analysis-sidebar-toggle svg {
+  transition: transform 0.25s ease;
+}
+
+.analysis-sidebar[data-collapsed="true"] .analysis-sidebar-toggle svg {
+  transform: rotate(180deg);
+}
+
+/* Function row hover micro-effect */
+.analysis-fn-row {
+  position: relative;
+  transition: background-color 0.15s ease, color 0.15s ease,
+    border-color 0.15s ease, padding-left 0.18s ease;
+}
+
+.analysis-fn-row:hover:not([data-active="true"]) {
+  padding-left: calc(1.75rem + 2px);
+}
+
+.analysis-fn-row[data-active="true"] {
+  animation: analysis-breathe 3.4s ease-in-out infinite;
+}
+
+.analysis-fn-row[data-active="true"]::after {
+  content: "";
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #818cf8;
+  box-shadow: 0 0 8px rgba(129, 140, 248, 0.85);
+}
+
+.analysis-fn-list-item {
+  animation: analysis-slide-in-left 0.22s ease-out both;
+}
+
+.analysis-fn-group-header {
+  transition: background-color 0.15s ease;
+}
+
+/* ============================================================
+ * Drawer / mobile overlay
+ * ============================================================ */
+.analysis-sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(2px);
+  z-index: 40;
+  animation: analysis-fade-in-soft 0.22s ease-out both;
+}
+
+.analysis-drawer-trigger {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #a1a1aa;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.analysis-drawer-trigger:hover {
+  color: #c7d2fe;
+  border-color: rgba(99, 102, 241, 0.4);
+  background: rgba(99, 102, 241, 0.08);
+}
+
+/* ============================================================
+ * Code viewer (entrance animation)
+ * ============================================================ */
+.analysis-codeviewer-wrap {
+  animation: analysis-fade-in 0.32s ease-out both;
+}
+
+/* ============================================================
+ * Scrollbars (consistent, scoped)
+ * ============================================================ */
+.codeviewer-scroll,
+.analysis-meta-scroll,
+.analysis-sidebar-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.08) transparent;
+}
+
+.codeviewer-scroll::-webkit-scrollbar,
+.analysis-meta-scroll::-webkit-scrollbar,
+.analysis-sidebar-scroll::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.codeviewer-scroll::-webkit-scrollbar-track,
+.analysis-meta-scroll::-webkit-scrollbar-track,
+.analysis-sidebar-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.codeviewer-scroll::-webkit-scrollbar-thumb,
+.analysis-meta-scroll::-webkit-scrollbar-thumb,
+.analysis-sidebar-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 999px;
+  transition: background-color 0.2s ease;
+}
+.codeviewer-scroll::-webkit-scrollbar-thumb:hover,
+.analysis-meta-scroll::-webkit-scrollbar-thumb:hover,
+.analysis-sidebar-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.35);
+}
+
+/* ============================================================
+ * ReactFlow theme overrides
+ * ============================================================ */
+.react-flow {
+  background-color: transparent;
+}
+.react-flow__attribution {
+  display: none;
+}
+.react-flow__controls-button {
+  background: transparent !important;
+  border: none !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+  color: #a1a1aa !important;
+  transition: all 0.18s ease;
+}
+.react-flow__controls-button:last-child {
+  border-bottom: none !important;
+}
+.react-flow__controls-button:hover {
+  background: rgba(99, 102, 241, 0.12) !important;
+  color: #c7d2fe !important;
+}
+.react-flow__controls-button svg {
+  fill: currentColor;
+}
+.react-flow__minimap {
+  margin: 12px;
+}
+.react-flow__edge-path {
+  transition: stroke 200ms ease, opacity 200ms ease;
+}
+.react-flow__node {
+  font-family: "JetBrains Mono", "Fira Code", Menlo, Monaco, monospace;
+  transition: transform 0.2s ease;
+}
+.react-flow__node.selected,
+.react-flow__node[data-selected="true"] {
+  z-index: 10;
+}
+.react-flow__handle {
+  pointer-events: none;
+}
+
+/* Pulse halo for selected CFG node */
+.analysis-node-selected {
+  animation: analysis-node-pulse 2.4s ease-in-out infinite;
+}
+
+/* ============================================================
+ * Responsive
+ * ============================================================ */
+/* Medium screens: collapse sidebar by default to give code more room */
+@media (max-width: 1440px) and (min-width: 1024px) {
+  .analysis-sidebar:not([data-collapsed="false"]) {
+    width: 240px;
+  }
+}
+
+/* Small screens: hide sidebar, allow drawer to slide in */
+@media (max-width: 1023px) {
+  .analysis-drawer-trigger {
+    display: inline-flex;
+  }
+
+  .analysis-sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 50;
+    transform: translateX(-100%);
+    width: 280px !important;
+    box-shadow: 24px 0 60px -30px rgba(0, 0, 0, 0.85);
+  }
+
+  .analysis-sidebar[data-drawer-open="true"] {
+    transform: translateX(0);
+  }
+
+  .analysis-sidebar-toggle {
+    display: none;
+  }
+
+  .analysis-content {
+    padding: 12px;
+    gap: 12px;
+  }
+
+  /* Stack code + meta vertically on small screens */
+  .analysis-detail-split {
+    flex-direction: column !important;
+  }
+  .analysis-detail-split > .analysis-detail-meta {
+    width: 100% !important;
+    max-height: 280px;
+  }
+}
+
+/* Extra-small adjustments */
+@media (max-width: 640px) {
+  .analysis-header {
+    flex-wrap: wrap;
+    gap: 12px !important;
+    padding: 12px 16px !important;
+  }
+  .analysis-content {
+    padding: 8px;
+  }
+}
