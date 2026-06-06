@@ -2,7 +2,7 @@
 
 An end-to-end smart contract security audit platform. Upload a Solidity project (or pick a built-in example), and watch the AI analyze vulnerabilities in real-time with streaming output and an animated pipeline visualization.
 
-## Architecture
+## Architectures
 
 ```
 ┌──────────┬─────────────────────────┬────────────────────┐
