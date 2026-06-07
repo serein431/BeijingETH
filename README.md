@@ -17,7 +17,7 @@ An end-to-end smart contract security audit platform. Upload a Solidity project 
 └──────────┴─────────────────────────┴────────────────────┘
 ```
 
-- **Backend**: FastAPI + OpenAI-compatible LLM (claude_sonnet4_5) + Slither + Foundry
+- **Backend**: FastAPI + Hunyuan LLM + Slither + Foundry
 - **Frontend**: React 19 + Vite + Tailwind CSS v4 + TypeScript
 
 ## Quick Start
@@ -35,36 +35,26 @@ Copy `.env.example` or create `.env` in the project root:
 ```env
 OPENAI_API_KEY=your_api_key
 OPENAI_BASE_URL=https://your-llm-endpoint/v1
-OPENAI_MODEL=claude_sonnet4_5
+OPENAI_MODEL=hunyuan-turbos-latest
 ```
 
-#### 如何更换 API
+#### 如何配置 API
 
 只需修改项目根目录下的 **`.env`** 文件中的三个变量即可：
 
 | 变量 | 说明 | 示例 |
 |------|------|------|
 | `OPENAI_API_KEY` | 你的 API Key | `sk-xxx...` |
-| `OPENAI_BASE_URL` | API 端点地址（需兼容 OpenAI 格式） | `https://api.openai.com/v1` |
-| `OPENAI_MODEL` | 使用的模型名称 | `gpt-4o` / `claude_sonnet4_5` |
+| `OPENAI_BASE_URL` | API 端点地址（需兼容 OpenAI 格式） | `https://api.hunyuan.cloud.tencent.com/v1` |
+| `OPENAI_MODEL` | 使用的模型名称 | `hunyuan-turbos-latest` |
 
-**常见配置示例：**
+**配置示例：**
 
 ```env
-# OpenAI 官方
-OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxx
-OPENAI_BASE_URL=https://api.openai.com/v1
-OPENAI_MODEL=gpt-4o
-
-# Anthropic (通过 OpenAI 兼容层)
-OPENAI_API_KEY=your_key
-OPENAI_BASE_URL=https://your-proxy/v1
-OPENAI_MODEL=claude-sonnet-4-5-20250514
-
-# 本地部署 (Ollama / vLLM)
-OPENAI_API_KEY=not-needed
-OPENAI_BASE_URL=http://localhost:11434/v1
-OPENAI_MODEL=llama3
+# 腾讯混元
+OPENAI_API_KEY=your_hunyuan_api_key
+OPENAI_BASE_URL=https://api.hunyuan.cloud.tencent.com/v1
+OPENAI_MODEL=hunyuan-turbos-latest
 ```
 
 > **注意**：API 端点必须兼容 OpenAI Chat Completions 格式 (`/chat/completions`)，支持流式响应（`stream=true`）。修改后重启后端即可生效。

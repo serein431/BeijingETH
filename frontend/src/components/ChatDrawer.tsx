@@ -162,7 +162,7 @@ export default function ChatDrawer({
                     </span>
                     <span className="chat-drawer__title-sub">
                       <span className="chat-drawer__pulse" />
-                      claude_sonnet_45 · {subtitle}
+                      Hunyuan · {subtitle}
                     </span>
                   </div>
                 </div>
